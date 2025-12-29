@@ -1,0 +1,1465 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ALPHA CHATS V2 - TERMINAL-STYLE UI (INSPIRED BY V1)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Base Dark Theme */
+:root {
+  --bg-primary: #181c2f;
+  --bg-secondary: #23234a;
+  --bg-tertiary: #2d1e60;
+  --text-primary: #ffffff;
+  --text-secondary: #b3b3ff;
+  --text-muted: #7f7fa8;
+  --accent-primary: #39ff14;
+  /* Neon green */
+  --accent-secondary: #ffe156;
+  /* Golden yellow */
+  --accent-tertiary: #ff6f3c;
+  /* Orange */
+  --accent-purple: #7f53ac;
+  /* Purple */
+  --border-color: rgba(57, 255, 20, 0.3);
+}
+
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background: linear-gradient(135deg, #181c2f 0%, #2d1e60 50%, #181c2f 100%);
+  color: var(--text-primary);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(57, 255, 20, 0.3);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(57, 255, 20, 0.5);
+}
+
+/* Selection color */
+::selection {
+  background-color: rgba(57, 255, 20, 0.3);
+  color: white;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   TERMINAL WINDOW STYLES
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.terminal-window {
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  background: rgba(35, 35, 74, 0.9);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  box-shadow:
+    0 0 40px rgba(57, 255, 20, 0.1),
+    0 20px 60px rgba(0, 0, 0, 0.4);
+}
+
+.terminal-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.terminal-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.terminal-dot.red {
+  background-color: #ff5f57;
+}
+
+.terminal-dot.yellow {
+  background-color: #ffbd2e;
+}
+
+.terminal-dot.green {
+  background-color: #28ca42;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   GRADIENT TEXT
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.gradient-text {
+  background: linear-gradient(135deg, #39ff14 0%, #ffe156 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.gradient-text-purple {
+  background: linear-gradient(135deg, #7f53ac 0%, #ff6f3c 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   GLOW EFFECTS
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.glow-green {
+  box-shadow: 0 0 20px rgba(57, 255, 20, 0.3);
+}
+
+.glow-purple {
+  box-shadow: 0 0 20px rgba(127, 83, 172, 0.3);
+}
+
+.text-glow {
+  text-shadow: 0 0 10px rgba(57, 255, 20, 0.5);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   BUTTONS
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.btn-primary {
+  background: linear-gradient(135deg, #39ff14 0%, #ffe156 100%);
+  color: #181c2f;
+  font-weight: 700;
+  padding: 14px 32px;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+  transform: translateY(0);
+  box-shadow: 0 4px 20px rgba(57, 255, 20, 0.3);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(57, 255, 20, 0.5);
+}
+
+.btn-github {
+  background: linear-gradient(135deg, #24292e 0%, #1a1e22 100%);
+  color: white;
+  font-weight: 600;
+  padding: 16px 32px;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+  border: 1px solid rgba(57, 255, 20, 0.3);
+}
+
+.btn-github:hover {
+  background: linear-gradient(135deg, #2d3338 0%, #24292e 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+  border-color: rgba(57, 255, 20, 0.5);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ANIMATIONS
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+@keyframes pulse-glow {
+
+  0%,
+  100% {
+    opacity: 0.4;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.7;
+    transform: scale(1.05);
+  }
+}
+
+@keyframes float {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes typewriter {
+  from {
+    width: 0;
+  }
+
+  to {
+    width: 100%;
+  }
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 3s ease-in-out infinite;
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   AMBIENT GLOW ORBS
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.ambient-orb {
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(60px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.orb-green {
+  background: rgba(57, 255, 20, 0.15);
+}
+
+.orb-purple {
+  background: rgba(127, 83, 172, 0.15);
+}
+
+.orb-orange {
+  background: rgba(255, 111, 60, 0.1);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   MATRIX GRID BACKGROUND
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.matrix-grid {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  grid-template-columns: repeat(40, 1fr);
+  grid-template-rows: repeat(20, 1fr);
+  gap: 2px;
+  opacity: 0.05;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.matrix-cell {
+  background: #39ff14;
+  animation: pulse-glow 3s ease-in-out infinite;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   CHAT STYLES
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.sidebar {
+  background: linear-gradient(180deg, rgba(35, 35, 74, 0.95) 0%, rgba(24, 28, 47, 0.95) 100%);
+  backdrop-filter: blur(12px);
+  border-right: 1px solid var(--border-color);
+}
+
+.channel-item {
+  transition: all 0.2s ease;
+  border-radius: 8px;
+}
+
+.channel-item:hover {
+  background: rgba(57, 255, 20, 0.1);
+}
+
+.channel-item.active {
+  background: rgba(57, 255, 20, 0.15);
+  border-left: 2px solid #39ff14;
+}
+
+.message-bubble {
+  background: rgba(45, 30, 96, 0.7);
+  border-radius: 12px;
+  animation: slideIn 0.2s ease-out;
+}
+
+.message-bubble.own {
+  background: linear-gradient(135deg, rgba(57, 255, 20, 0.2) 0%, rgba(127, 83, 172, 0.2) 100%);
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   TYPING INDICATOR
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.typing-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #39ff14;
+  animation: typingBounce 1.4s infinite ease-in-out both;
+}
+
+.typing-dot:nth-child(1) {
+  animation-delay: 0s;
+}
+
+.typing-dot:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.typing-dot:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes typingBounce {
+
+  0%,
+  80%,
+  100% {
+    transform: scale(0.7);
+    opacity: 0.5;
+  }
+
+  40% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ONLINE INDICATOR
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.online-pulse {
+  animation: onlinePulse 2s infinite;
+}
+
+@keyframes onlinePulse {
+
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(40, 202, 66, 0.4);
+  }
+
+  50% {
+    box-shadow: 0 0 0 6px rgba(40, 202, 66, 0);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   CODE BLOCKS
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.code-block {
+  font-family: 'Fira Code', 'Consolas', monospace;
+  background: rgba(24, 28, 47, 0.9);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  overflow-x: auto;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   INPUT FIELDS
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.input-terminal {
+  background: rgba(24, 28, 47, 0.7);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  color: white;
+  transition: all 0.2s ease;
+}
+
+.input-terminal:focus {
+  outline: none;
+  border-color: #39ff14;
+  box-shadow: 0 0 0 3px rgba(57, 255, 20, 0.1);
+}
+
+.input-terminal::placeholder {
+  color: var(--text-muted);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ENHANCED WELCOME PAGE STYLES (GSAP Optimized)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Optimized Matrix Grid - Reduced cells for performance */
+.matrix-grid-optimized {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  grid-template-rows: repeat(5, 1fr);
+  gap: 4px;
+  opacity: 0.03;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Enhanced Terminal Window */
+.terminal-window-enhanced {
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  background: linear-gradient(145deg,
+      rgba(35, 35, 74, 0.95) 0%,
+      rgba(24, 28, 47, 0.95) 100%);
+  border: 1px solid rgba(57, 255, 20, 0.2);
+  border-radius: 20px;
+  box-shadow:
+    0 0 60px rgba(57, 255, 20, 0.08),
+    0 25px 80px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  will-change: transform, opacity;
+  overflow: hidden;
+}
+
+.terminal-header-enhanced {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 20px;
+  border-bottom: 1px solid rgba(57, 255, 20, 0.15);
+  background: rgba(0, 0, 0, 0.2);
+}
+
+/* Animated Gradient Orbs */
+.gradient-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  will-change: transform;
+  animation: orbFloat 8s ease-in-out infinite;
+}
+
+.gradient-orb-1 {
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(57, 255, 20, 0.15) 0%, transparent 70%);
+  top: -100px;
+  left: -100px;
+  animation-delay: 0s;
+}
+
+.gradient-orb-2 {
+  width: 350px;
+  height: 350px;
+  background: radial-gradient(circle, rgba(127, 83, 172, 0.15) 0%, transparent 70%);
+  bottom: -80px;
+  right: -80px;
+  animation-delay: 2s;
+}
+
+.gradient-orb-3 {
+  width: 250px;
+  height: 250px;
+  background: radial-gradient(circle, rgba(255, 111, 60, 0.1) 0%, transparent 70%);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  animation-delay: 4s;
+}
+
+@keyframes orbFloat {
+
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+
+  25% {
+    transform: translate(20px, -20px) scale(1.05);
+  }
+
+  50% {
+    transform: translate(-10px, 10px) scale(0.95);
+  }
+
+  75% {
+    transform: translate(15px, 15px) scale(1.02);
+  }
+}
+
+/* Floating Particles */
+.particles {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  overflow: hidden;
+}
+
+.particle {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  background: #39ff14;
+  border-radius: 50%;
+  opacity: 0.3;
+  animation: particleFloat 10s linear infinite;
+}
+
+@keyframes particleFloat {
+  0% {
+    transform: translateY(100vh) rotate(0deg);
+    opacity: 0;
+  }
+
+  10% {
+    opacity: 0.4;
+  }
+
+  90% {
+    opacity: 0.4;
+  }
+
+  100% {
+    transform: translateY(-100vh) rotate(720deg);
+    opacity: 0;
+  }
+}
+
+/* Animated Gradient Text */
+.gradient-text-animated {
+  background: linear-gradient(135deg,
+      #39ff14 0%,
+      #ffe156 25%,
+      #ff6f3c 50%,
+      #7f53ac 75%,
+      #39ff14 100%);
+  background-size: 200% 200%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: gradientShift 4s ease infinite;
+}
+
+@keyframes gradientShift {
+
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+/* Enhanced Badges */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  font-size: 11px;
+  font-family: 'Fira Code', monospace;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  border-radius: 20px;
+  will-change: transform;
+}
+
+.badge-green {
+  background: rgba(57, 255, 20, 0.15);
+  color: #39ff14;
+  border: 1px solid rgba(57, 255, 20, 0.3);
+}
+
+.badge-purple {
+  background: rgba(127, 83, 172, 0.15);
+  color: #7f53ac;
+  border: 1px solid rgba(127, 83, 172, 0.3);
+}
+
+.badge-dot {
+  width: 6px;
+  height: 6px;
+  background: #39ff14;
+  border-radius: 50%;
+  animation: badgePulse 2s ease-in-out infinite;
+}
+
+@keyframes badgePulse {
+
+  0%,
+  100% {
+    opacity: 1;
+    box-shadow: 0 0 0 0 rgba(57, 255, 20, 0.5);
+  }
+
+  50% {
+    opacity: 0.7;
+    box-shadow: 0 0 0 4px rgba(57, 255, 20, 0);
+  }
+}
+
+/* Feature Cards */
+.feature-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: linear-gradient(145deg,
+      rgba(24, 28, 47, 0.6) 0%,
+      rgba(35, 35, 74, 0.4) 100%);
+  border: 1px solid rgba(57, 255, 20, 0.15);
+  cursor: pointer;
+  will-change: transform, box-shadow, border-color;
+  transition: background 0.3s ease;
+}
+
+.feature-card:hover {
+  background: linear-gradient(145deg,
+      rgba(57, 255, 20, 0.08) 0%,
+      rgba(24, 28, 47, 0.6) 100%);
+}
+
+.feature-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: rgba(57, 255, 20, 0.1);
+  border-radius: 8px;
+  color: #39ff14;
+  font-size: 14px;
+}
+
+/* Enhanced GitHub Button */
+.btn-github-enhanced {
+  position: relative;
+  background: linear-gradient(135deg, #24292e 0%, #1a1e22 100%);
+  color: white;
+  font-weight: 600;
+  padding: 16px 32px;
+  border-radius: 14px;
+  border: 1px solid rgba(57, 255, 20, 0.3);
+  overflow: hidden;
+  will-change: transform, box-shadow;
+  transition: border-color 0.3s ease;
+}
+
+.btn-github-enhanced::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg,
+      transparent 0%,
+      rgba(57, 255, 20, 0.1) 50%,
+      transparent 100%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.btn-github-enhanced:hover::before {
+  opacity: 1;
+}
+
+.btn-github-enhanced:hover {
+  border-color: rgba(57, 255, 20, 0.5);
+}
+
+.btn-arrow {
+  display: inline-block;
+  margin-left: 8px;
+  transition: transform 0.3s ease;
+}
+
+.btn-github-enhanced:hover .btn-arrow {
+  transform: translateX(4px);
+}
+
+/* Channel Tags */
+.channel-tag {
+  display: inline-block;
+  padding: 6px 12px;
+  font-size: 11px;
+  font-family: 'Fira Code', monospace;
+  background: linear-gradient(145deg,
+      rgba(24, 28, 47, 0.8) 0%,
+      rgba(35, 35, 74, 0.6) 100%);
+  color: #b3b3ff;
+  border-radius: 6px;
+  border: 1px solid rgba(57, 255, 20, 0.15);
+  opacity: 0;
+  animation: tagFadeIn 0.4s ease forwards;
+  transition: all 0.2s ease;
+}
+
+.channel-tag:hover {
+  border-color: rgba(57, 255, 20, 0.4);
+  color: #39ff14;
+  transform: translateY(-2px);
+}
+
+@keyframes tagFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Logo Glow Effect */
+.logo-glow {
+  text-shadow: 0 0 20px rgba(57, 255, 20, 0.5), 0 0 40px rgba(57, 255, 20, 0.3);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ALPHA CHAT - GREEN & BLACK THEME
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Chat Background */
+.alpha-chat-bg {
+  background: linear-gradient(135deg, #0a0a0a 0%, #0d1a0d 50%, #0a0a0a 100%);
+}
+
+/* Sidebar */
+.alpha-sidebar {
+  background: linear-gradient(180deg, rgba(13, 13, 13, 0.98) 0%, rgba(10, 15, 10, 0.98) 100%);
+  backdrop-filter: blur(20px);
+  border-right: 1px solid rgba(57, 255, 20, 0.1);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Sidebar header section - explicit styling to ensure visibility */
+.alpha-sidebar>div:first-child,
+.alpha-sidebar>div:nth-child(2) {
+  flex-shrink: 0 !important;
+  flex-grow: 0 !important;
+  min-height: fit-content;
+  background: rgba(13, 13, 13, 0.98);
+}
+
+/* Search Input */
+.alpha-search-input {
+  background: rgba(57, 255, 20, 0.03);
+  border: 1px solid rgba(57, 255, 20, 0.1);
+  border-radius: 10px;
+  color: white;
+  font-family: 'Fira Code', monospace;
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
+}
+
+.alpha-search-input:focus {
+  outline: none;
+  border-color: rgba(57, 255, 20, 0.3);
+  background: rgba(57, 255, 20, 0.05);
+}
+
+.alpha-search-input::placeholder {
+  color: #555;
+}
+
+/* Tabs */
+.alpha-tab {
+  color: #666;
+  transition: all 0.2s ease;
+  border-bottom: 2px solid transparent;
+}
+
+.alpha-tab:hover {
+  color: #999;
+}
+
+.alpha-tab.active {
+  color: #39ff14;
+  border-bottom-color: #39ff14;
+}
+
+/* Channel/Conversation Cards */
+.channel-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+}
+
+.channel-card:hover {
+  background: rgba(57, 255, 20, 0.05);
+  border-color: rgba(57, 255, 20, 0.1);
+}
+
+.channel-card.active {
+  background: rgba(57, 255, 20, 0.08);
+  border-color: rgba(57, 255, 20, 0.2);
+}
+
+/* Small Button */
+.alpha-btn-sm {
+  padding: 4px 10px;
+  font-size: 0.7rem;
+  font-family: 'Fira Code', monospace;
+  font-weight: 600;
+  background: rgba(57, 255, 20, 0.1);
+  color: #39ff14;
+  border: 1px solid rgba(57, 255, 20, 0.3);
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.alpha-btn-sm:hover {
+  background: rgba(57, 255, 20, 0.2);
+}
+
+/* Unread Badge */
+.alpha-badge {
+  padding: 2px 8px;
+  font-size: 0.65rem;
+  font-weight: 600;
+  background: #39ff14;
+  color: #000;
+  border-radius: 10px;
+}
+
+/* Chat Area */
+.alpha-chat-area {
+  background: linear-gradient(180deg, #0a0a0a 0%, #080d08 100%);
+  overflow: hidden;
+}
+
+/* Chat Header */
+.alpha-chat-header {
+  height: 60px;
+  min-height: 60px;
+  flex-shrink: 0;
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(13, 13, 13, 0.95);
+  border-bottom: 1px solid rgba(57, 255, 20, 0.1);
+  backdrop-filter: blur(10px);
+}
+
+/* Icon Button */
+.alpha-icon-btn {
+  padding: 8px;
+  border-radius: 8px;
+  color: #555;
+  transition: all 0.2s ease;
+}
+
+.alpha-icon-btn:hover {
+  background: rgba(57, 255, 20, 0.1);
+  color: #39ff14;
+}
+
+/* Messages Container */
+.alpha-messages-container {
+  background: repeating-linear-gradient(0deg,
+      transparent,
+      transparent 40px,
+      rgba(57, 255, 20, 0.01) 40px,
+      rgba(57, 255, 20, 0.01) 41px);
+}
+
+/* Message Bubbles */
+.alpha-message-own {
+  background: linear-gradient(135deg, rgba(57, 255, 20, 0.15) 0%, rgba(57, 255, 20, 0.08) 100%);
+  color: white;
+  border: 1px solid rgba(57, 255, 20, 0.2);
+}
+
+.alpha-message-other {
+  background: rgba(20, 20, 20, 0.9);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* Code Block */
+.alpha-code-block {
+  border: 1px solid rgba(57, 255, 20, 0.15);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+/* Message Input */
+.alpha-message-input {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  background: rgba(13, 13, 13, 0.9);
+  border: 1px solid rgba(57, 255, 20, 0.15);
+  border-radius: 14px;
+  transition: all 0.2s ease;
+}
+
+.alpha-message-input:focus-within {
+  border-color: rgba(57, 255, 20, 0.3);
+}
+
+/* Input Buttons */
+.alpha-input-btn {
+  padding: 8px;
+  border-radius: 8px;
+  color: #555;
+  transition: all 0.2s ease;
+}
+
+.alpha-input-btn:hover {
+  color: #888;
+}
+
+.alpha-input-btn.active {
+  color: #39ff14;
+  background: rgba(57, 255, 20, 0.1);
+}
+
+/* Send Button */
+.alpha-send-btn {
+  padding: 10px;
+  border-radius: 10px;
+  background: rgba(57, 255, 20, 0.1);
+  color: #39ff14;
+  transition: all 0.2s ease;
+}
+
+.alpha-send-btn:hover:not(:disabled) {
+  background: rgba(57, 255, 20, 0.2);
+}
+
+.alpha-send-btn:disabled {
+  color: #333;
+  background: transparent;
+}
+
+/* Typing Dots Animation - Green */
+.typing-dot {
+  background: #39ff14 !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   SLACK-STYLE LAYOUT (KEEPING TERMINAL COLORS)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Sidebar Sections */
+.slack-section {
+  margin-bottom: 8px;
+}
+
+.slack-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 12px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  border-radius: 6px;
+}
+
+.slack-section-header:hover {
+  background: rgba(57, 255, 20, 0.05);
+}
+
+.slack-section-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.slack-section-title svg {
+  transition: transform 0.2s ease;
+}
+
+.slack-section-title.collapsed svg {
+  transform: rotate(-90deg);
+}
+
+.slack-section-add {
+  padding: 4px;
+  border-radius: 4px;
+  color: #666;
+  opacity: 0;
+  transition: all 0.15s ease;
+}
+
+.slack-section-header:hover .slack-section-add {
+  opacity: 1;
+}
+
+.slack-section-add:hover {
+  background: rgba(57, 255, 20, 0.1);
+  color: #39ff14;
+}
+
+/* Slack Channel Items */
+.slack-channel-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px 6px 24px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  border-radius: 6px;
+  color: #ccc;
+}
+
+.slack-channel-item:hover {
+  background: rgba(57, 255, 20, 0.08);
+  color: #fff;
+}
+
+.slack-channel-item.active {
+  background: rgba(57, 255, 20, 0.15);
+  color: #39ff14;
+}
+
+.slack-channel-hash {
+  font-size: 1rem;
+  font-weight: 500;
+  color: inherit;
+  opacity: 0.7;
+}
+
+.slack-channel-name {
+  flex: 1;
+  font-size: 0.9rem;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.slack-channel-badge {
+  padding: 2px 6px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  background: #39ff14;
+  color: #000;
+  border-radius: 10px;
+  min-width: 18px;
+  text-align: center;
+}
+
+/* Slack DM Items */
+.slack-dm-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 12px 6px 24px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  border-radius: 6px;
+  color: #ccc;
+}
+
+.slack-dm-item:hover {
+  background: rgba(57, 255, 20, 0.08);
+  color: #fff;
+}
+
+.slack-dm-item.active {
+  background: rgba(57, 255, 20, 0.15);
+  color: #39ff14;
+}
+
+.slack-dm-avatar {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.slack-dm-avatar img {
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+}
+
+.slack-online-dot {
+  position: absolute;
+  bottom: -2px;
+  right: -2px;
+  width: 10px;
+  height: 10px;
+  background: #39ff14;
+  border: 2px solid #0d0d0d;
+  border-radius: 50%;
+}
+
+.slack-offline-dot {
+  position: absolute;
+  bottom: -1px;
+  right: -1px;
+  width: 8px;
+  height: 8px;
+  border: 2px solid #666;
+  border-radius: 50%;
+  background: transparent;
+}
+
+/* Slack Message List (Flat, no bubbles) */
+.slack-message {
+  display: flex;
+  gap: 12px;
+  padding: 8px 20px;
+  transition: background 0.1s ease;
+  position: relative;
+}
+
+.slack-message:hover {
+  background: rgba(57, 255, 20, 0.03);
+}
+
+.slack-message-avatar {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 6px;
+  margin-top: 2px;
+}
+
+.slack-message-content {
+  flex: 1;
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.slack-message-header {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.slack-message-sender {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.slack-message-sender:hover {
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.slack-message-time {
+  font-size: 0.7rem;
+  color: #666;
+}
+
+.slack-message-text {
+  font-size: 0.9rem;
+  color: #ddd;
+  line-height: 1.5;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  white-space: pre-wrap;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+/* Slack Message Hover Actions */
+.slack-message-actions {
+  position: absolute;
+  top: -16px;
+  right: 20px;
+  display: flex;
+  gap: 2px;
+  padding: 4px;
+  background: rgba(20, 20, 20, 0.95);
+  border: 1px solid rgba(57, 255, 20, 0.2);
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.15s ease;
+}
+
+.slack-message:hover .slack-message-actions {
+  opacity: 1;
+  visibility: visible;
+}
+
+.slack-action-btn {
+  padding: 6px 8px;
+  border-radius: 4px;
+  color: #888;
+  transition: all 0.15s ease;
+  font-size: 1rem;
+}
+
+.slack-action-btn:hover {
+  background: rgba(57, 255, 20, 0.15);
+  color: #39ff14;
+}
+
+/* Slack Message Divider (Date) */
+.slack-date-divider {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 20px;
+}
+
+.slack-date-divider::before,
+.slack-date-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: rgba(57, 255, 20, 0.1);
+}
+
+.slack-date-divider span {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #888;
+  padding: 4px 12px;
+  background: rgba(20, 20, 20, 0.8);
+  border: 1px solid rgba(57, 255, 20, 0.15);
+  border-radius: 20px;
+}
+
+/* Slack Chat Header */
+.slack-chat-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 20px;
+  border-bottom: 1px solid rgba(57, 255, 20, 0.1);
+  background: rgba(13, 13, 13, 0.95);
+  backdrop-filter: blur(10px);
+  flex-shrink: 0;
+  min-height: 50px;
+}
+
+.slack-chat-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.slack-chat-title h2 {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.slack-chat-title .hash {
+  color: #39ff14;
+  opacity: 0.7;
+}
+
+.slack-chat-star {
+  color: #666;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.slack-chat-star:hover,
+.slack-chat-star.active {
+  color: #ffe156;
+}
+
+.slack-chat-meta {
+  font-size: 0.75rem;
+  color: #666;
+  margin-top: 2px;
+}
+
+.slack-chat-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.slack-header-btn {
+  padding: 8px;
+  border-radius: 6px;
+  color: #888;
+  transition: all 0.15s ease;
+}
+
+.slack-header-btn:hover {
+  background: rgba(57, 255, 20, 0.1);
+  color: #39ff14;
+}
+
+/* Slack Input Bar */
+.slack-input-container {
+  padding: 12px 20px 20px;
+}
+
+.slack-input-wrapper {
+  background: rgba(13, 13, 13, 0.9);
+  border: 1px solid rgba(57, 255, 20, 0.2);
+  border-radius: 12px;
+  overflow: hidden;
+  transition: all 0.2s ease;
+}
+
+.slack-input-wrapper:focus-within {
+  border-color: rgba(57, 255, 20, 0.4);
+  box-shadow: 0 0 0 3px rgba(57, 255, 20, 0.1);
+}
+
+.slack-input-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 8px 12px;
+  border-bottom: 1px solid rgba(57, 255, 20, 0.1);
+}
+
+.slack-toolbar-btn {
+  padding: 6px 8px;
+  border-radius: 4px;
+  color: #666;
+  transition: all 0.15s ease;
+  font-size: 0.85rem;
+}
+
+.slack-toolbar-btn:hover {
+  background: rgba(57, 255, 20, 0.1);
+  color: #888;
+}
+
+.slack-toolbar-btn.active {
+  background: rgba(57, 255, 20, 0.15);
+  color: #39ff14;
+}
+
+.slack-toolbar-divider {
+  width: 1px;
+  height: 20px;
+  background: rgba(57, 255, 20, 0.1);
+  margin: 0 6px;
+}
+
+.slack-input-area {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  padding: 12px;
+}
+
+.slack-input-area textarea {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  resize: none;
+  min-height: 24px;
+  max-height: 120px;
+}
+
+.slack-input-area textarea::placeholder {
+  color: #555;
+}
+
+.slack-input-area textarea:focus {
+  outline: none;
+}
+
+.slack-send-btn {
+  padding: 8px 12px;
+  border-radius: 6px;
+  background: rgba(57, 255, 20, 0.2);
+  color: #39ff14;
+  transition: all 0.15s ease;
+}
+
+.slack-send-btn:hover:not(:disabled) {
+  background: rgba(57, 255, 20, 0.3);
+}
+
+.slack-send-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+/* Slack Empty State */
+.slack-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 40px;
+  text-align: center;
+}
+
+.slack-empty-icon {
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(57, 255, 20, 0.1);
+  border: 1px solid rgba(57, 255, 20, 0.2);
+  border-radius: 16px;
+  margin-bottom: 20px;
+  font-size: 2rem;
+  color: #39ff14;
+}
+
+.slack-empty-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 8px;
+}
+
+.slack-empty-subtitle {
+  font-size: 0.9rem;
+  color: #666;
+  max-width: 300px;
+}
+
+/* Role Badges */
+.slack-role-badge {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 6px;
+}
+
+.slack-role-badge svg {
+  font-size: 0.75rem;
+}

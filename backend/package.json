@@ -1,0 +1,34 @@
+{
+    "name": "alpha-chats-v2-backend",
+    "version": "2.0.0",
+    "description": "Alpha Chats V2 - Real-time chat for coders with GitHub OAuth, Teams & Channels",
+    "license": "ISC",
+    "author": "Vikash (Team Lead)",
+    "type": "module",
+    "main": "index.js",
+    "scripts": {
+        "start": "node index.js",
+        "dev": "nodemon index.js",
+        "seed": "node scripts/seed.js",
+        "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js"
+    },
+    "dependencies": {
+        "bcryptjs": "^3.0.2",
+        "cloudinary": "^2.6.1",
+        "cookie-parser": "^1.4.7",
+        "cors": "^2.8.5",
+        "dotenv": "^16.5.0",
+        "express": "^5.1.0",
+        "express-session": "^1.18.1",
+        "jsonwebtoken": "^9.0.2",
+        "mongoose": "^8.15.0",
+        "multer": "^2.0.0",
+        "passport": "^0.7.0",
+        "passport-github2": "^0.1.12",
+        "socket.io": "^4.8.1"
+    },
+    "devDependencies": {
+        "nodemon": "^3.1.10",
+        "jest": "^29.7.0"
+    }
+}
