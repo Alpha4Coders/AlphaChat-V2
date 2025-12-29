@@ -119,9 +119,9 @@ export const togglePinMessage = async (req, res) => {
             return res.status(404).json({ success: false, message: "Message not found" });
         }
 
-        // Check if user has admin rights
+        // Check if user has admin rights - core and cofounders can pin
         const channel = await Channel.findById(message.channel);
-        const isAdmin = channel.admins.includes(req.user._id) || req.user.role === 'cofounder';
+        const isAdmin = channel.admins.includes(req.user._id) || req.user.role === 'cofounder' || req.user.role === 'core';
 
         if (!isAdmin) {
             return res.status(403).json({ success: false, message: "Admin privileges required" });
@@ -163,9 +163,9 @@ export const deleteChannelMessage = async (req, res) => {
             return res.status(404).json({ success: false, message: "Message not found" });
         }
 
-        // Check permissions
+        // Check permissions - admins, core, and cofounders can delete any message
         const channel = await Channel.findById(message.channel);
-        const isAdmin = channel.admins.includes(req.user._id) || req.user.role === 'cofounder';
+        const isAdmin = channel.admins.includes(req.user._id) || req.user.role === 'cofounder' || req.user.role === 'core';
         const isSender = message.sender.equals(req.user._id);
 
         if (!isAdmin && !isSender) {

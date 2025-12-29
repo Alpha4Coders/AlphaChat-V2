@@ -1,11 +1,11 @@
 import { useState, useEffect, useRef } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { HiUsers, HiDotsVertical, HiStar, HiOutlineStar } from 'react-icons/hi'
+import { HiUsers, HiDotsVertical, HiStar, HiOutlineStar, HiX } from 'react-icons/hi'
 import { FaPaperPlane, FaCode, FaPaperclip, FaBold, FaItalic, FaStrikethrough, FaLink, FaListUl, FaListOl } from 'react-icons/fa'
 import { HiEmojiHappy } from 'react-icons/hi'
 import axios from '../../config/axios'
 import { ENDPOINTS } from '../../config/api'
-import { setChannelMessages, addChannelMessage, setDMMessages, addDMMessage, setLoadingMessages } from '../../redux/chatSlice'
+import { setChannelMessages, addChannelMessage, setDMMessages, addDMMessage, setLoadingMessages, updateMessageReactions, updateChannelMessage } from '../../redux/chatSlice'
 import { getSocket, sendTyping } from '../../hooks/useSocket'
 import MessageItem from './MessageItem'
 import LoadingSpinner from '../Common/LoadingSpinner'
@@ -21,6 +21,11 @@ const ChatArea = () => {
     const [messageType, setMessageType] = useState('text')
     const [isSending, setIsSending] = useState(false)
     const [isStarred, setIsStarred] = useState(false)
+
+    // Edit modal state
+    const [editingMessage, setEditingMessage] = useState(null)
+    const [editContent, setEditContent] = useState('')
+    const [isEditing, setIsEditing] = useState(false)
 
     // Auto-detect programming language from code content
     const detectLanguage = (code) => {
@@ -92,12 +97,38 @@ const ChatArea = () => {
             }
         }
 
+        // Real-time reaction updates
+        const handleMessageReaction = (data) => {
+            if (activeChannel) {
+                dispatch(updateMessageReactions({
+                    channelId: activeChannel._id,
+                    messageId: data.messageId,
+                    reactions: data.reactions
+                }))
+            }
+        }
+
+        // Real-time message edits
+        const handleMessageEdited = (data) => {
+            if (activeChannel) {
+                dispatch(updateChannelMessage({
+                    channelId: activeChannel._id,
+                    messageId: data.messageId,
+                    updates: data.message
+                }))
+            }
+        }
+
         socket.on('channelMessage', handleChannelMessage)
         socket.on('directMessage', handleDirectMessage)
+        socket.on('messageReaction', handleMessageReaction)
+        socket.on('messageEdited', handleMessageEdited)
 
         return () => {
             socket.off('channelMessage', handleChannelMessage)
             socket.off('directMessage', handleDirectMessage)
+            socket.off('messageReaction', handleMessageReaction)
+            socket.off('messageEdited', handleMessageEdited)
         }
     }, [activeChannel, activeConversation, dispatch])
 
@@ -153,6 +184,42 @@ const ChatArea = () => {
             senderName: user.displayName,
             isTyping
         })
+    }
+
+    // Edit message handlers
+    const handleEditStart = (msg) => {
+        setEditingMessage(msg)
+        setEditContent(msg.content)
+    }
+
+    const handleEditCancel = () => {
+        setEditingMessage(null)
+        setEditContent('')
+    }
+
+    const handleEditSave = async () => {
+        if (!editContent.trim() || isEditing) return
+
+        setIsEditing(true)
+        try {
+            const res = await axios.patch(ENDPOINTS.MESSAGES.EDIT(editingMessage._id), {
+                content: editContent.trim()
+            })
+
+            if (res.data.success) {
+                dispatch(updateChannelMessage({
+                    channelId: activeChannel._id,
+                    messageId: editingMessage._id,
+                    updates: res.data.message
+                }))
+                handleEditCancel()
+            }
+        } catch (error) {
+            console.error('Failed to edit message:', error)
+            alert('Failed to edit message')
+        } finally {
+            setIsEditing(false)
+        }
     }
 
     // Header info
@@ -213,6 +280,8 @@ const ChatArea = () => {
                                     index === 0 ||
                                     (messages[index - 1]?.sender._id || messages[index - 1]?.sender) !== (msg.sender._id || msg.sender)
                                 }
+                                channelId={isChannel ? activeChannel._id : null}
+                                onEdit={handleEditStart}
                             />
                         ))}
                         <div ref={messagesEndRef} />
@@ -326,6 +395,45 @@ const ChatArea = () => {
             ) : (
                 <div className="p-4 border-t border-[#39ff14]/10 text-center">
                     <p className="text-gray-500 text-sm">Join this channel to send messages</p>
+                </div>
+            )}
+
+            {/* Edit Message Modal */}
+            {editingMessage && (
+                <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+                    <div className="bg-[#1a1a1a] border border-[#39ff14]/20 rounded-lg p-4 w-full max-w-lg mx-4">
+                        <div className="flex items-center justify-between mb-4">
+                            <h3 className="text-lg font-semibold text-white">Edit Message</h3>
+                            <button
+                                onClick={handleEditCancel}
+                                className="text-gray-400 hover:text-white transition-colors"
+                            >
+                                <HiX className="w-5 h-5" />
+                            </button>
+                        </div>
+                        <textarea
+                            value={editContent}
+                            onChange={(e) => setEditContent(e.target.value)}
+                            className="w-full bg-black/50 border border-[#39ff14]/20 rounded-lg p-3 text-white resize-none focus:outline-none focus:border-[#39ff14]/50"
+                            rows={4}
+                            autoFocus
+                        />
+                        <div className="flex justify-end gap-2 mt-4">
+                            <button
+                                onClick={handleEditCancel}
+                                className="px-4 py-2 text-gray-400 hover:text-white transition-colors"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={handleEditSave}
+                                disabled={!editContent.trim() || isEditing}
+                                className="px-4 py-2 bg-[#39ff14] text-black font-medium rounded-lg hover:bg-[#32e012] transition-colors disabled:opacity-50"
+                            >
+                                {isEditing ? 'Saving...' : 'Save Changes'}
+                            </button>
+                        </div>
+                    </div>
                 </div>
             )}
         </div>
