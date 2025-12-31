@@ -71,8 +71,7 @@ const channelSchema = new mongoose.Schema({
     }
 }, { timestamps: true });
 
-// Index for faster queries
-channelSchema.index({ slug: 1 });
+// Index for faster queries (slug already has unique index from schema)
 channelSchema.index({ order: 1 });
 
 const Channel = mongoose.model("Channel", channelSchema);

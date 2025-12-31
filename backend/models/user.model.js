@@ -93,9 +93,7 @@ const userSchema = new mongoose.Schema({
   }
 }, { timestamps: true });
 
-// Index for faster queries
-userSchema.index({ githubId: 1 });
-userSchema.index({ username: 1 });
+// Index for faster queries (githubId and username already have unique indexes from schema)
 userSchema.index({ role: 1 });
 
 const User = mongoose.model("User", userSchema);
