@@ -77,16 +77,25 @@ app.use(express.json());
 app.use(cookieParser());
 
 // Session configuration
+const isProduction = process.env.NODE_ENV === 'production';
 app.use(session({
     secret: process.env.SESSION_SECRET || 'alpha-chats-v2-secret',
     resave: false,
     saveUninitialized: false,
     cookie: {
-        secure: process.env.NODE_ENV === 'production',
+        secure: isProduction,  // HTTPS only in production
         httpOnly: true,
+        sameSite: isProduction ? 'none' : 'lax',  // 'none' required for cross-site cookies
         maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
-    }
+    },
+    // Trust first proxy (Render)
+    proxy: isProduction
 }));
+
+// Trust proxy for secure cookies behind Render's load balancer
+if (isProduction) {
+    app.set('trust proxy', 1);
+}
 
 // Initialize Passport
 configurePassport();
