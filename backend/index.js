@@ -52,22 +52,26 @@ const io = new Server(server, {
 const onlineUsers = new Map();
 const typingUsers = new Map();
 
-// ═══════════════════════════════════════════════════════════════════════════
-// MIDDLEWARE SETUP
-// ═══════════════════════════════════════════════════════════════════════════
+// Add explicit production URLs to ensure they're always allowed
+const productionOrigins = [
+    "https://alphachat-v2.vercel.app",
+    "https://alphachat-v2-backend.onrender.com"
+];
 
-console.log("CORS allowed origins:", allowedOrigins);
+const finalAllowedOrigins = [...new Set([...allowedOrigins, ...productionOrigins])];
+console.log("CORS allowed origins:", finalAllowedOrigins);
 
 app.use(cors({
     origin: function (origin, callback) {
         // Allow requests with no origin (mobile apps, Postman, etc.)
         if (!origin) return callback(null, true);
 
-        if (allowedOrigins.includes(origin)) {
+        if (finalAllowedOrigins.includes(origin)) {
             callback(null, true);
         } else {
-            console.log("CORS blocked origin:", origin);
-            callback(null, true); // Temporarily allow all for debugging
+            // Allow but log for debugging (shouldn't happen in production)
+            console.log("CORS: Allowing unlisted origin:", origin);
+            callback(null, true);
         }
     },
     credentials: true
