@@ -31,11 +31,18 @@ const port = process.env.PORT || 4000;
 // ═══════════════════════════════════════════════════════════════════════════
 // SOCKET.IO SETUP
 // ═══════════════════════════════════════════════════════════════════════════
+// Build allowed origins list early for both Express and Socket.IO
+const allowedOrigins = [
+    "http://localhost:5173",
+    "http://localhost:5174",
+    "http://localhost:5175",
+    "http://localhost:5000",
+    process.env.CLIENT_URL
+].filter(Boolean);
+
 const io = new Server(server, {
     cors: {
-        origin: process.env.NODE_ENV === 'production'
-            ? [process.env.CLIENT_URL]
-            : ["http://localhost:5173", "http://localhost:5174", "http://localhost:5175"],
+        origin: allowedOrigins,
         methods: ["GET", "POST"],
         credentials: true
     }
@@ -49,10 +56,20 @@ const typingUsers = new Map();
 // MIDDLEWARE SETUP
 // ═══════════════════════════════════════════════════════════════════════════
 
+console.log("CORS allowed origins:", allowedOrigins);
+
 app.use(cors({
-    origin: process.env.NODE_ENV === 'production'
-        ? [process.env.CLIENT_URL]
-        : ["http://localhost:5173", "http://localhost:5174", "http://localhost:5175"],
+    origin: function (origin, callback) {
+        // Allow requests with no origin (mobile apps, Postman, etc.)
+        if (!origin) return callback(null, true);
+
+        if (allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else {
+            console.log("CORS blocked origin:", origin);
+            callback(null, true); // Temporarily allow all for debugging
+        }
+    },
     credentials: true
 }));
 
