@@ -24,46 +24,46 @@ const Welcome = () => {
     useLayoutEffect(() => {
         const ctx = gsap.context(() => {
             // Initial hidden states
-            gsap.set([terminalRef.current], { 
-                opacity: 0, 
+            gsap.set([terminalRef.current], {
+                opacity: 0,
                 scale: 0.9,
-                y: 30 
+                y: 30
             })
-            gsap.set(logoRef.current?.children || [], { 
-                opacity: 0, 
-                y: -20 
+            gsap.set(logoRef.current?.children || [], {
+                opacity: 0,
+                y: -20
             })
-            gsap.set(taglineRef.current, { 
-                opacity: 0, 
-                x: -30 
+            gsap.set(taglineRef.current, {
+                opacity: 0,
+                x: -30
             })
-            gsap.set(badgesRef.current?.children || [], { 
-                opacity: 0, 
-                scale: 0 
+            gsap.set(badgesRef.current?.children || [], {
+                opacity: 0,
+                scale: 0
             })
-            gsap.set(featuresRef.current?.children || [], { 
-                opacity: 0, 
+            gsap.set(featuresRef.current?.children || [], {
+                opacity: 0,
                 y: 20,
-                scale: 0.8 
+                scale: 0.8
             })
-            gsap.set(buttonRef.current, { 
-                opacity: 0, 
-                y: 20 
+            gsap.set(buttonRef.current, {
+                opacity: 0,
+                y: 20
             })
-            gsap.set(channelsRef.current, { 
-                opacity: 0, 
-                y: 20 
+            gsap.set(channelsRef.current, {
+                opacity: 0,
+                y: 20
             })
-            gsap.set(footerRef.current, { 
-                opacity: 0, 
-                y: 10 
+            gsap.set(footerRef.current, {
+                opacity: 0,
+                y: 10
             })
 
             // Master timeline for orchestrated animations
             const tl = gsap.timeline({
-                defaults: { 
+                defaults: {
                     ease: 'power3.out',
-                    duration: 0.6 
+                    duration: 0.6
                 }
             })
 
@@ -75,61 +75,61 @@ const Welcome = () => {
                 duration: 0.8,
                 ease: 'back.out(1.2)'
             })
-            
-            // Logo elements stagger
-            .to(logoRef.current?.children || [], {
-                opacity: 1,
-                y: 0,
-                stagger: 0.1,
-                duration: 0.5
-            }, '-=0.3')
-            
-            // Badges pop in
-            .to(badgesRef.current?.children || [], {
-                opacity: 1,
-                scale: 1,
-                stagger: 0.15,
-                ease: 'elastic.out(1, 0.5)',
-                duration: 0.6
-            }, '-=0.2')
-            
-            // Tagline slide in
-            .to(taglineRef.current, {
-                opacity: 1,
-                x: 0,
-                duration: 0.5
-            }, '-=0.3')
-            
-            // Feature cards stagger with bounce
-            .to(featuresRef.current?.children || [], {
-                opacity: 1,
-                y: 0,
-                scale: 1,
-                stagger: 0.1,
-                ease: 'back.out(1.4)',
-                duration: 0.5
-            }, '-=0.2')
-            
-            // GitHub button
-            .to(buttonRef.current, {
-                opacity: 1,
-                y: 0,
-                duration: 0.5
-            }, '-=0.2')
-            
-            // Channels section
-            .to(channelsRef.current, {
-                opacity: 1,
-                y: 0,
-                duration: 0.5
-            }, '-=0.2')
-            
-            // Footer fade in
-            .to(footerRef.current, {
-                opacity: 1,
-                y: 0,
-                duration: 0.4
-            }, '-=0.2')
+
+                // Logo elements stagger
+                .to(logoRef.current?.children || [], {
+                    opacity: 1,
+                    y: 0,
+                    stagger: 0.1,
+                    duration: 0.5
+                }, '-=0.3')
+
+                // Badges pop in
+                .to(badgesRef.current?.children || [], {
+                    opacity: 1,
+                    scale: 1,
+                    stagger: 0.15,
+                    ease: 'elastic.out(1, 0.5)',
+                    duration: 0.6
+                }, '-=0.2')
+
+                // Tagline slide in
+                .to(taglineRef.current, {
+                    opacity: 1,
+                    x: 0,
+                    duration: 0.5
+                }, '-=0.3')
+
+                // Feature cards stagger with bounce
+                .to(featuresRef.current?.children || [], {
+                    opacity: 1,
+                    y: 0,
+                    scale: 1,
+                    stagger: 0.1,
+                    ease: 'back.out(1.4)',
+                    duration: 0.5
+                }, '-=0.2')
+
+                // GitHub button
+                .to(buttonRef.current, {
+                    opacity: 1,
+                    y: 0,
+                    duration: 0.5
+                }, '-=0.2')
+
+                // Channels section
+                .to(channelsRef.current, {
+                    opacity: 1,
+                    y: 0,
+                    duration: 0.5
+                }, '-=0.2')
+
+                // Footer fade in
+                .to(footerRef.current, {
+                    opacity: 1,
+                    y: 0,
+                    duration: 0.4
+                }, '-=0.2')
 
             // Typing cursor blink
             gsap.to(cursorRef.current, {
@@ -158,8 +158,8 @@ const Welcome = () => {
     const handleButtonHover = (isHovering) => {
         gsap.to(buttonRef.current, {
             scale: isHovering ? 1.02 : 1,
-            boxShadow: isHovering 
-                ? '0 15px 40px rgba(0, 0, 0, 0.5), 0 0 30px rgba(57, 255, 20, 0.3)' 
+            boxShadow: isHovering
+                ? '0 15px 40px rgba(0, 0, 0, 0.5), 0 0 30px rgba(57, 255, 20, 0.3)'
                 : '0 4px 20px rgba(0, 0, 0, 0.3)',
             duration: 0.3,
             ease: 'power2.out'
@@ -276,6 +276,14 @@ const Welcome = () => {
                             <span className="text-[#39ff14]">$</span> Secure authentication via GitHub OAuth
                         </p>
 
+                        {/* Browser Compatibility Warning */}
+                        <div className="mt-4 p-2 bg-yellow-500/5 border border-yellow-500/10 rounded-lg backdrop-blur-sm mx-auto max-w-[80%]">
+                            <p className="text-yellow-200/60 text-[10px] font-mono text-center leading-relaxed">
+                                ⚠️ <span className="font-bold text-yellow-200/80">Brave / Safari users:</span><br />
+                                Disable "Shields" or "Prevent Cross-Site Tracking" if login fails.
+                            </p>
+                        </div>
+
                         {/* Channels Preview */}
                         <div ref={channelsRef} className="mt-6 pt-6 border-t border-[rgba(57,255,20,0.15)]">
                             <p className="text-[#b3b3ff] text-xs font-mono mb-3">
@@ -312,8 +320,8 @@ const FeatureCard = ({ icon, text }) => {
         gsap.to(cardRef.current, {
             scale: isHovering ? 1.05 : 1,
             borderColor: isHovering ? 'rgba(57, 255, 20, 0.5)' : 'rgba(57, 255, 20, 0.15)',
-            boxShadow: isHovering 
-                ? '0 8px 25px rgba(57, 255, 20, 0.15)' 
+            boxShadow: isHovering
+                ? '0 8px 25px rgba(57, 255, 20, 0.15)'
                 : '0 0 0 rgba(0, 0, 0, 0)',
             duration: 0.3,
             ease: 'power2.out'
@@ -321,7 +329,7 @@ const FeatureCard = ({ icon, text }) => {
     }
 
     return (
-        <div 
+        <div
             ref={cardRef}
             onMouseEnter={() => handleHover(true)}
             onMouseLeave={() => handleHover(false)}
