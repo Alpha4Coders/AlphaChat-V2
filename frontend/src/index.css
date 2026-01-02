@@ -133,6 +133,14 @@ body {
   text-shadow: 0 0 10px rgba(57, 255, 20, 0.5);
 }
 
+.text-glow-green {
+  text-shadow: 0 0 8px rgba(57, 255, 20, 0.6);
+}
+
+.text-glow-orange {
+  text-shadow: 0 0 8px rgba(255, 111, 60, 0.6);
+}
+
 /* ═══════════════════════════════════════════════════════════════════════════
    BUTTONS
    ═══════════════════════════════════════════════════════════════════════════ */
@@ -975,6 +983,49 @@ body {
   margin-bottom: 8px;
 }
 
+.slack-section-hea.dm-user-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+}
+
+.dm-user-card:hover {
+  background: rgba(57, 255, 20, 0.05);
+  border-color: rgba(57, 255, 20, 0.1);
+}
+
+.dm-user-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.dm-user-name {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #ffffff;
+  /* Brighter white for better contrast */
+  margin-bottom: 2px;
+}
+
+.dm-user-role {
+  font-size: 0.75rem;
+  color: rgba(57, 255, 20, 0.8);
+  /* Brighter neon green */
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.dm-users-scroll {
+  flex: 1;
+  overflow-y: auto;
+  padding-bottom: 80px;
+  /* Extra padding to avoid footer overlap */
+}
+
 .slack-section-header {
   display: flex;
   align-items: center;
@@ -1462,4 +1513,356 @@ body {
 
 .slack-role-badge svg {
   font-size: 0.75rem;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   DM LIST - ENHANCED DIRECT MESSAGES UI
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.dm-list {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: linear-gradient(180deg, rgba(13, 13, 13, 0.98) 0%, rgba(10, 15, 10, 0.98) 100%);
+  overflow: hidden;
+}
+
+/* Search Container */
+.dm-search-container {
+  padding: 16px;
+  border-bottom: 1px solid rgba(57, 255, 20, 0.1);
+  background: rgba(13, 13, 13, 0.98);
+  flex-shrink: 0;
+}
+
+.dm-search-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.dm-search-icon {
+  position: absolute;
+  left: 12px;
+  color: #666;
+  font-size: 1.125rem;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.dm-search-input {
+  width: 100%;
+  padding: 12px 12px 12px 40px;
+  background: rgba(35, 35, 74, 0.4);
+  border: 1px solid rgba(57, 255, 20, 0.15);
+  border-radius: 12px;
+  color: white;
+  font-size: 0.875rem;
+  font-family: 'Fira Code', monospace;
+  transition: all 0.2s ease;
+}
+
+.dm-search-input:focus {
+  outline: none;
+  border-color: rgba(57, 255, 20, 0.4);
+  background: rgba(35, 35, 74, 0.6);
+  box-shadow: 0 0 0 3px rgba(57, 255, 20, 0.05);
+}
+
+.dm-search-input::placeholder {
+  color: #666;
+}
+
+/* Connection Status */
+.dm-connection-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: rgba(13, 13, 13, 0.98);
+  border-bottom: 1px solid rgba(57, 255, 20, 0.05);
+  flex-shrink: 0;
+}
+
+.dm-status-dot {
+  width: 8px;
+  height: 8px;
+  background: #39ff14;
+  border-radius: 50%;
+  box-shadow: 0 0 8px rgba(57, 255, 20, 0.6);
+  animation: pulseGlow 2s ease-in-out infinite;
+}
+
+@keyframes pulseGlow {
+
+  0%,
+  100% {
+    box-shadow: 0 0 8px rgba(57, 255, 20, 0.6);
+    opacity: 1;
+  }
+
+  50% {
+    box-shadow: 0 0 16px rgba(57, 255, 20, 0.8);
+    opacity: 0.8;
+  }
+}
+
+.dm-status-text {
+  font-size: 0.75rem;
+  color: #39ff14;
+  font-weight: 600;
+  font-family: 'Fira Code', monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Users Scroll Container */
+.dm-users-scroll {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 8px;
+}
+
+.dm-no-users {
+  text-align: center;
+  color: #666;
+  font-size: 0.875rem;
+  padding: 20px;
+  font-family: 'Fira Code', monospace;
+}
+
+/* User Card */
+.dm-user-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  margin-bottom: 6px;
+  border-radius: 12px;
+  background: linear-gradient(145deg, rgba(35, 35, 74, 0.3) 0%, rgba(24, 28, 47, 0.2) 100%);
+  border: 1px solid rgba(57, 255, 20, 0.08);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.dm-user-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(145deg, rgba(57, 255, 20, 0.05) 0%, transparent 100%);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.dm-user-card:hover::before {
+  opacity: 1;
+}
+
+.dm-user-card:hover {
+  border-color: rgba(57, 255, 20, 0.25);
+  transform: translateX(4px);
+  background: linear-gradient(145deg, rgba(35, 35, 74, 0.5) 0%, rgba(24, 28, 47, 0.4) 100%);
+}
+
+.dm-user-card.active {
+  border-color: rgba(57, 255, 20, 0.4);
+  background: linear-gradient(145deg, rgba(57, 255, 20, 0.15) 0%, rgba(35, 35, 74, 0.6) 100%);
+}
+
+/* Avatar Wrapper */
+.dm-user-avatar-wrapper {
+  position: relative;
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+}
+
+.dm-user-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  object-fit: cover;
+  border: 2px solid rgba(57, 255, 20, 0.2);
+  transition: all 0.2s ease;
+}
+
+.dm-user-card:hover .dm-user-avatar {
+  border-color: rgba(57, 255, 20, 0.4);
+  transform: scale(1.05);
+}
+
+/* User Status Indicator */
+.dm-user-status {
+  position: absolute;
+  bottom: -2px;
+  right: -2px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid rgba(13, 13, 13, 0.98);
+  z-index: 1;
+}
+
+.dm-user-status.online {
+  background: #28ca42;
+  box-shadow: 0 0 8px rgba(40, 202, 66, 0.5);
+}
+
+.dm-user-status.offline {
+  background: #666;
+}
+
+/* User Info */
+.dm-user-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.dm-user-name {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: white;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dm-user-username {
+  font-size: 0.75rem;
+  color: #999;
+  font-family: 'Fira Code', monospace;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dm-user-status-text {
+  font-size: 0.7rem;
+  font-family: 'Fira Code', monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  margin-top: 2px;
+}
+
+.dm-user-card .dm-user-status-text {
+  color: #666;
+}
+
+.dm-user-card:has(.dm-user-status.online) .dm-user-status-text {
+  color: #28ca42;
+}
+
+/* GitHub Link Icon */
+.dm-user-github {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(57, 255, 20, 0.1);
+  border-radius: 8px;
+  color: #39ff14;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+  border: 1px solid rgba(57, 255, 20, 0.2);
+}
+
+.dm-user-github:hover {
+  background: rgba(57, 255, 20, 0.2);
+  transform: scale(1.1);
+  box-shadow: 0 0 12px rgba(57, 255, 20, 0.3);
+}
+
+/* Add User Button Container */
+.dm-add-user-container {
+  padding: 12px 16px;
+  border-top: 1px solid rgba(57, 255, 20, 0.1);
+  background: rgba(13, 13, 13, 0.98);
+  flex-shrink: 0;
+}
+
+.dm-add-user-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px;
+  background: linear-gradient(135deg, rgba(57, 255, 20, 0.1) 0%, rgba(57, 255, 20, 0.05) 100%);
+  border: 1px dashed rgba(57, 255, 20, 0.3);
+  border-radius: 10px;
+  color: #39ff14;
+  font-size: 0.875rem;
+  font-weight: 600;
+  font-family: 'Fira Code', monospace;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.dm-add-user-btn:hover {
+  background: linear-gradient(135deg, rgba(57, 255, 20, 0.15) 0%, rgba(57, 255, 20, 0.1) 100%);
+  border-color: rgba(57, 255, 20, 0.5);
+  box-shadow: 0 0 16px rgba(57, 255, 20, 0.2);
+  transform: translateY(-2px);
+}
+
+.dm-add-icon {
+  font-size: 1.125rem;
+}
+
+/* Animations */
+@keyframes dmCardSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.dm-user-card {
+  animation: dmCardSlideIn 0.3s ease-out;
+}
+
+/* Custom Scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(57, 255, 20, 0.2);
+  border-radius: 3px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(57, 255, 20, 0.4);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.2s ease-out;
 }

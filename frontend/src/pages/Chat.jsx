@@ -57,7 +57,7 @@ const Chat = () => {
     }, [dispatch])
 
     return (
-        <div ref={containerRef} className="h-screen w-screen flex overflow-hidden bg-[#0a0a0a]">
+        <div ref={containerRef} className="h-[100dvh] w-screen flex overflow-hidden bg-[#0a0a0a]">
             {/* Sidebar */}
             <Sidebar />
 

@@ -1,70 +1,28 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
-import { HiChevronDown, HiPlus } from 'react-icons/hi'
-import { FaTerminal, FaHashtag } from 'react-icons/fa'
-import { gsap } from 'gsap'
-import { setActiveChannel, setActiveConversation, updateChannelMembership } from '../../redux/chatSlice'
+import { HiChevronDown, HiRefresh, HiSearch } from 'react-icons/hi'
+import { HiChatAlt2, HiHashtag, HiPlus, HiX } from 'react-icons/hi'
+import { FaTerminal } from 'react-icons/fa'
+import { setActiveChannel, updateChannelMembership } from '../../redux/chatSlice'
 import { addJoinedChannel } from '../../redux/userSlice'
 import { joinChannel as socketJoinChannel } from '../../hooks/useSocket'
 import axios from '../../config/axios'
 import { ENDPOINTS } from '../../config/api'
+import DMList from './DMList'
 
 const Sidebar = () => {
     const dispatch = useDispatch()
     const navigate = useNavigate()
     const { user } = useSelector(state => state.user)
-    const { channels, conversations, activeChannel, activeConversation, onlineUsers } = useSelector(state => state.chat)
+    const { channels, activeChannel } = useSelector(state => state.chat)
+
+    const [activeTab, setActiveTab] = useState('channels') // 'chats' | 'channels'
     const [searchQuery, setSearchQuery] = useState('')
-    const [channelsExpanded, setChannelsExpanded] = useState(true)
-    const [dmsExpanded, setDmsExpanded] = useState(true)
-    const channelsRef = useRef(null)
-    const dmsRef = useRef(null)
-    const scrollContainerRef = useRef(null)
-
-    // GSAP animation on section toggle - with clearProps to prevent layout issues
-    useEffect(() => {
-        if (channelsRef.current) {
-            const items = channelsRef.current.querySelectorAll('.slack-channel-item')
-            if (channelsExpanded && items.length > 0) {
-                gsap.fromTo(items,
-                    { opacity: 0, x: -10 },
-                    {
-                        opacity: 1,
-                        x: 0,
-                        duration: 0.2,
-                        stagger: 0.02,
-                        ease: 'power2.out',
-                        clearProps: 'all' // Prevent leftover GSAP styles
-                    }
-                )
-            }
-        }
-    }, [channelsExpanded])
-
-    useEffect(() => {
-        if (dmsRef.current) {
-            const items = dmsRef.current.querySelectorAll('.slack-dm-item')
-            if (dmsExpanded && items.length > 0) {
-                gsap.fromTo(items,
-                    { opacity: 0, x: -10 },
-                    {
-                        opacity: 1,
-                        x: 0,
-                        duration: 0.2,
-                        stagger: 0.02,
-                        ease: 'power2.out',
-                        clearProps: 'all' // Prevent leftover GSAP styles
-                    }
-                )
-            }
-        }
-    }, [dmsExpanded])
+    const [showNewChat, setShowNewChat] = useState(false)
 
     const handleChannelClick = async (channel) => {
-        console.log('handleChannelClick called with channel:', channel)
         dispatch(setActiveChannel(channel))
-        // setActiveChannel already clears activeConversation
         socketJoinChannel(channel._id)
     }
 
@@ -82,27 +40,22 @@ const Sidebar = () => {
         }
     }
 
-    const handleConversationClick = (conversation) => {
-        dispatch(setActiveConversation(conversation))
-        // setActiveConversation already clears activeChannel
-    }
-
     const filteredChannels = channels.filter(c =>
         c.name.toLowerCase().includes(searchQuery.toLowerCase())
     )
 
-    const filteredConversations = conversations.filter(c =>
-        c.otherUser?.displayName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        c.otherUser?.username?.toLowerCase().includes(searchQuery.toLowerCase())
-    )
+    const getSearchPlaceholder = () => {
+        if (activeTab === 'channels') return 'Search channels...'
+        return 'Search conversations...'
+    }
 
     return (
-        <div className="alpha-sidebar w-72 h-full flex flex-col">
-            {/* Workspace Header */}
-            <div className="flex-shrink-0 p-3 border-b border-[#39ff14]/10">
+        <div className="alpha-sidebar w-80 h-full flex flex-col bg-[#0d1117] border-r border-[#39ff14]/10">
+            {/* Header / Brand */}
+            <div className="flex-shrink-0 p-4 pb-2">
                 <button
                     onClick={() => navigate('/profile')}
-                    className="w-full flex items-center justify-between p-2 rounded-lg hover:bg-[#39ff14]/5 transition-colors"
+                    className="w-full flex items-center justify-between p-2 rounded-lg hover:bg-[#39ff14]/5 transition-colors mb-4"
                 >
                     <div className="flex items-center gap-2">
                         <FaTerminal className="w-5 h-5 text-[#39ff14]" />
@@ -112,135 +65,161 @@ const Sidebar = () => {
                     </div>
                     <HiChevronDown className="w-4 h-4 text-gray-500" />
                 </button>
-            </div>
 
-            {/* Search */}
-            <div className="flex-shrink-0 p-3">
-                <input
-                    type="text"
-                    placeholder="Search..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full px-3 py-2 bg-[#39ff14]/5 border border-[#39ff14]/10 rounded-lg text-sm text-white placeholder-gray-500 focus:outline-none focus:border-[#39ff14]/30"
-                />
-            </div>
-
-            {/* Scrollable Content */}
-            <div className="flex-1 overflow-y-auto px-2 pb-2">
-                {/* Channels Section */}
-                <div className="slack-section">
-                    <div
-                        className="slack-section-header"
-                        onClick={() => setChannelsExpanded(!channelsExpanded)}
+                {/* Custom Tabs */}
+                <div className="grid grid-cols-2 gap-2 mb-4 px-1">
+                    <button
+                        onClick={() => setActiveTab('chats')}
+                        className={`flex items-center justify-center gap-1.5 px-2 py-1.5 rounded-lg transition-all ${activeTab === 'chats'
+                            ? 'bg-[#39ff14] text-black font-bold shadow-[0_0_10px_rgba(57,255,20,0.3)]'
+                            : 'text-gray-400 hover:text-white bg-[#39ff14]/5 hover:bg-[#39ff14]/10'
+                            }`}
                     >
-                        <div className={`slack-section-title ${!channelsExpanded ? 'collapsed' : ''}`}>
-                            <HiChevronDown className="w-3 h-3" />
-                            <span>Channels</span>
-                        </div>
-                        <button className="slack-section-add" onClick={(e) => e.stopPropagation()}>
-                            <HiPlus className="w-4 h-4" />
-                        </button>
-                    </div>
+                        <HiChatAlt2 className="w-4 h-4 flex-shrink-0" />
+                        <span className="text-xs font-medium">Chats</span>
+                    </button>
 
-                    {channelsExpanded && (
-                        <div ref={channelsRef} className="mt-1">
-                            {filteredChannels.map(channel => {
-                                const canAccess = channel.isMember || user?.role === 'cofounder' || user?.role === 'core'
-                                return (
-                                    <div
-                                        key={channel._id}
-                                        onClick={() => {
-                                            console.log('Channel clicked:', channel.name, 'canAccess:', canAccess, 'user.role:', user?.role, 'isMember:', channel.isMember)
-                                            if (canAccess) handleChannelClick(channel)
-                                        }}
-                                        className={`slack-channel-item ${activeChannel?._id === channel._id ? 'active' : ''
-                                            } ${!canAccess ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
-                                    >
-                                        <span className="slack-channel-hash">#</span>
-                                        <span className="slack-channel-name">{channel.name}</span>
-                                        {!channel.isMember && user?.role !== 'cofounder' && user?.role !== 'core' && (
-                                            <button
-                                                onClick={(e) => handleJoinChannel(channel, e)}
-                                                className="text-xs px-2 py-0.5 bg-[#39ff14]/10 text-[#39ff14] rounded hover:bg-[#39ff14]/20"
+                    <button
+                        onClick={() => setActiveTab('channels')}
+                        className={`flex items-center justify-center gap-1.5 px-2 py-1.5 rounded-lg transition-all ${activeTab === 'channels'
+                            ? 'bg-[#39ff14] text-black font-bold shadow-[0_0_10px_rgba(57,255,20,0.3)]'
+                            : 'text-gray-400 hover:text-white bg-[#39ff14]/5 hover:bg-[#39ff14]/10'
+                            }`}
+                    >
+                        <HiHashtag className="w-4 h-4 flex-shrink-0" />
+                        <span className="text-xs font-medium">Channels</span>
+                    </button>
+                </div>
+
+                {/* Search Bar Row */}
+                <div className="flex items-center gap-2 mb-2">
+                    <div className="flex-1 relative">
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <HiSearch className="h-4 w-4 text-[#39ff14]/70" />
+                        </div>
+                        <input
+                            type="text"
+                            placeholder={getSearchPlaceholder()}
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            className="w-full pl-9 pr-3 py-2 bg-[#0d1117] border border-[#39ff14]/20 rounded-lg text-sm text-white placeholder-gray-500 focus:outline-none focus:border-[#39ff14] focus:ring-1 focus:ring-[#39ff14] transition-all"
+                        />
+                    </div>
+                    <button
+                        className="p-2 text-[#39ff14] border border-[#39ff14]/20 rounded-lg hover:bg-[#39ff14]/10 transition-colors flex-shrink-0"
+                        onClick={() => {/* Refresh logic if needed */ }}
+                    >
+                        <HiRefresh className="w-4 h-4" />
+                    </button>
+                </div>
+            </div>
+
+            {/* Content Area - Fixed overflow handling */}
+            <div className="flex-1 overflow-hidden px-2 pb-2 flex flex-col relative">
+
+                {!showNewChat && (
+                    <>
+                        {/* CHANNELS VIEW - Needs its own scroll container */}
+                        {activeTab === 'channels' && (
+                            <div className="flex-1 overflow-y-auto custom-scrollbar space-y-0.5 mt-2 min-h-0">
+                                {filteredChannels.length === 0 ? (
+                                    <div className="text-center text-gray-500 text-sm mt-8">
+                                        No channels found
+                                    </div>
+                                ) : (
+                                    filteredChannels.map(channel => {
+                                        const canAccess = channel.isMember || user?.role === 'cofounder' || user?.role === 'core'
+                                        const isActive = activeChannel?._id === channel._id
+
+                                        return (
+                                            <div
+                                                key={channel._id}
+                                                onClick={() => canAccess && handleChannelClick(channel)}
+                                                className={`group flex items-center justify-between px-3 py-2 rounded-lg cursor-pointer transition-all ${isActive
+                                                    ? 'bg-[#39ff14] text-black font-medium shadow-[0_0_10px_rgba(57,255,20,0.2)]'
+                                                    : canAccess ? 'text-gray-300 hover:bg-[#39ff14]/10 hover:text-white' : 'text-gray-600 opacity-60 cursor-not-allowed'
+                                                    }`}
                                             >
-                                                Join
-                                            </button>
-                                        )}
-                                    </div>
-                                )
-                            })}
-                        </div>
-                    )}
-                </div>
+                                                <div className="flex items-center gap-3 overflow-hidden">
+                                                    <span className={`text-lg ${isActive ? 'text-black/70' : 'text-[#39ff14]'}`}>#</span>
+                                                    <span className="truncate">{channel.name}</span>
+                                                </div>
 
-                {/* Direct Messages Section */}
-                <div className="slack-section mt-2">
-                    <div
-                        className="slack-section-header"
-                        onClick={() => setDmsExpanded(!dmsExpanded)}
-                    >
-                        <div className={`slack-section-title ${!dmsExpanded ? 'collapsed' : ''}`}>
-                            <HiChevronDown className="w-3 h-3" />
-                            <span>Direct Messages</span>
-                        </div>
-                        <button className="slack-section-add" onClick={(e) => e.stopPropagation()}>
-                            <HiPlus className="w-4 h-4" />
+                                                {!channel.isMember && user?.role !== 'cofounder' && user?.role !== 'core' && (
+                                                    <button
+                                                        onClick={(e) => handleJoinChannel(channel, e)}
+                                                        className={`text-xs px-2 py-0.5 rounded border ${isActive
+                                                            ? 'border-black/20 text-black hover:bg-black/10'
+                                                            : 'border-[#39ff14]/30 text-[#39ff14] hover:bg-[#39ff14]/20'
+                                                            }`}
+                                                    >
+                                                        Join
+                                                    </button>
+                                                )}
+                                            </div>
+                                        )
+                                    })
+                                )}
+                            </div>
+                        )}
+
+                        {/* CHATS VIEW (Active DMs) - DMList handles scrolling */}
+                        {activeTab === 'chats' && (
+                            <div className="h-full">
+                                <DMList
+                                    searchQuery={searchQuery}
+                                    isNewChatMode={false}
+                                />
+                            </div>
+                        )}
+
+                        {/* Floating Action Button (FAB) */}
+                        <button
+                            onClick={() => setShowNewChat(true)}
+                            className="absolute bottom-4 right-4 w-12 h-12 bg-[#39ff14] text-black rounded-full flex items-center justify-center shadow-[0_0_15px_rgba(57,255,20,0.4)] hover:shadow-[0_0_20px_rgba(57,255,20,0.6)] hover:scale-110 transition-all z-10 group"
+                        >
+                            <HiPlus className="w-6 h-6 group-hover:rotate-90 transition-transform duration-300" />
                         </button>
-                    </div>
+                    </>
+                )}
 
-                    {dmsExpanded && (
-                        <div ref={dmsRef} className="mt-1">
-                            {filteredConversations.length === 0 ? (
-                                <p className="text-xs text-gray-600 px-6 py-2">No conversations</p>
-                            ) : (
-                                filteredConversations.map(conversation => (
-                                    <div
-                                        key={conversation._id}
-                                        onClick={() => handleConversationClick(conversation)}
-                                        className={`slack-dm-item ${activeConversation?._id === conversation._id ? 'active' : ''
-                                            }`}
-                                    >
-                                        <div className="slack-dm-avatar">
-                                            <img
-                                                src={conversation.otherUser?.avatar}
-                                                alt={conversation.otherUser?.displayName}
-                                            />
-                                            {onlineUsers.includes(conversation.otherUser?._id) ? (
-                                                <div className="slack-online-dot" />
-                                            ) : (
-                                                <div className="slack-offline-dot" />
-                                            )}
-                                        </div>
-                                        <span className="slack-channel-name">
-                                            {conversation.otherUser?.displayName}
-                                        </span>
-                                        {conversation.unreadCount > 0 && (
-                                            <span className="slack-channel-badge">
-                                                {conversation.unreadCount}
-                                            </span>
-                                        )}
-                                    </div>
-                                ))
-                            )}
+                {/* New Chat Overlay */}
+                {showNewChat && (
+                    <div className="absolute inset-0 bg-[#0d1117] z-30 flex flex-col animate-fadeIn">
+                        <div className="flex items-center justify-between px-3 py-3 border-b border-[#39ff14]/10 bg-[#0d1117]">
+                            <span className="text-[#39ff14] font-bold text-sm uppercase tracking-wider">New Chat</span>
+                            <button
+                                onClick={() => setShowNewChat(false)}
+                                className="p-1 rounded-full hover:bg-[#39ff14]/10 text-gray-400 hover:text-white transition-colors"
+                            >
+                                <HiX className="w-5 h-5" />
+                            </button>
                         </div>
-                    )}
-                </div>
+                        <div className="flex-1 overflow-hidden relative">
+                            <DMList
+                                searchQuery={searchQuery}
+                                isNewChatMode={true}
+                                onCloseNewChat={() => setShowNewChat(false)}
+                            />
+                        </div>
+                    </div>
+                )}
             </div>
 
-            {/* User Footer */}
-            <div className="flex-shrink-0 p-3 border-t border-[#39ff14]/10">
-                <div className="flex items-center gap-3">
+            {/* Profile Footer */}
+            <div className="mt-auto flex-shrink-0 p-3 pb-10 mb-2 bg-[#0d1117] border-t border-[#39ff14]/10 z-30 shadow-[0_-10px_20px_rgba(13,17,23,0.8)]">
+                <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-[#39ff14]/5 cursor-pointer transition-colors">
                     <div className="relative">
                         <img
                             src={user?.avatar}
                             alt={user?.displayName}
-                            className="w-9 h-9 rounded-lg"
+                            className="w-10 h-10 rounded-lg border border-[#39ff14]/20"
                         />
-                        <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-[#39ff14] rounded-full border-2 border-[#0d0d0d]" />
+                        <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-[#39ff14] rounded-full border-2 border-[#0d1117] shadow-[0_0_5px_#39ff14]" />
                     </div>
                     <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-white truncate">{user?.displayName}</p>
-                        <p className="text-xs text-gray-500">@{user?.username}</p>
+                        <p className="text-sm font-bold text-white truncate">{user?.displayName}</p>
+                        <p className="text-xs text-[#39ff14]/70 truncate">@{user?.username}</p>
                     </div>
                 </div>
             </div>
