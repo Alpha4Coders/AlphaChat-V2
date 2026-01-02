@@ -32,13 +32,69 @@ export const githubCallback = async (req, res) => {
             await user.save();
         }
 
-        // Redirect to frontend
+        // Check if this is a mobile OAuth request (state parameter set by mobile app)
+        const isMobile = req.session?.oauthMobile === true;
+
+        if (isMobile) {
+            // Clear the mobile flag
+            delete req.session.oauthMobile;
+
+            // Redirect to backend's own mobile success page
+            // Mobile WebView will catch this URL and extract cookies
+            return res.redirect('/api/auth/mobile/success');
+        }
+
+        // Web: Redirect to frontend
         const clientUrl = process.env.CLIENT_URL || 'http://localhost:5173';
         res.redirect(`${clientUrl}/chat`);
     } catch (error) {
         console.error("GitHub callback error:", error);
         res.redirect(`${process.env.CLIENT_URL}/login?error=auth_failed`);
     }
+};
+
+// Mobile OAuth Success Page - Returns simple HTML that mobile WebView can detect
+export const mobileAuthSuccess = (req, res) => {
+    if (!req.isAuthenticated()) {
+        return res.status(401).json({ success: false, message: 'Not authenticated' });
+    }
+
+    // Return a simple HTML page that the mobile app can detect
+    // The session cookie is already set, mobile just needs to detect this page loaded
+    res.send(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1">
+            <title>AlphaChat - Login Success</title>
+            <style>
+                body {
+                    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                    background: linear-gradient(135deg, #012106 0%, #020E2A 50%, #012106 100%);
+                    color: #07AD52;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    height: 100vh;
+                    margin: 0;
+                    text-align: center;
+                }
+                .container { padding: 20px; }
+                h1 { font-size: 24px; margin-bottom: 10px; }
+                p { color: #888; font-size: 14px; }
+                .success { font-size: 48px; margin-bottom: 20px; }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="success">✓</div>
+                <h1>Login Successful!</h1>
+                <p>Redirecting to app...</p>
+            </div>
+        </body>
+        </html>
+    `);
 };
 
 // Get current authenticated user
@@ -121,4 +177,4 @@ export const checkAuth = (req, res) => {
     });
 };
 
-export default { githubCallback, getCurrentUser, logout, checkAuth };
+export default { githubCallback, getCurrentUser, logout, checkAuth, mobileAuthSuccess };
