@@ -543,15 +543,24 @@ export const sendDirectMessage = async (req, res) => {
 
         // Emit via Socket.IO
         if (req.io && req.onlineUsers) {
+            console.log(`📨 Checking if recipient ${recipientId} is online. Online users: ${req.onlineUsers.size}`);
+            console.log(`📨 Online user IDs: ${Array.from(req.onlineUsers.keys()).join(', ')}`);
+            
             const recipient = Array.from(req.onlineUsers.entries())
                 .find(([uId]) => uId === recipientId.toString());
 
             if (recipient) {
+                console.log(`📨 Recipient found! Emitting to socket: ${recipient[1].socketId}`);
                 req.io.to(recipient[1].socketId).emit('directMessage', {
                     conversationId: conversation._id,
                     message
                 });
+                console.log(`✅ directMessage event emitted to ${recipientId}`);
+            } else {
+                console.log(`❌ Recipient ${recipientId} not online, message not emitted via socket`);
             }
+        } else {
+            console.log(`⚠️ Socket.IO or onlineUsers not available`);
         }
 
         res.status(201).json({
