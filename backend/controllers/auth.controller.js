@@ -32,8 +32,9 @@ export const githubCallback = async (req, res) => {
             await user.save();
         }
 
-        // Check if this is a mobile OAuth request (state parameter set by mobile app)
-        const isMobile = req.session?.oauthMobile === true;
+        // Check if this is a mobile OAuth request (state parameter set by mobile app OR user agent)
+        const userAgent = req.headers['user-agent'] || '';
+        const isMobile = req.session?.oauthMobile === true || userAgent.includes('AlphaChatMobile');
 
         if (isMobile) {
             // Clear the mobile flag
