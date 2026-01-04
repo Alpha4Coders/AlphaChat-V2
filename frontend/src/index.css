@@ -983,7 +983,7 @@ body {
   margin-bottom: 8px;
 }
 
-.slack-section-hea.dm-user-card {
+.slack-section-header {
   display: flex;
   align-items: center;
   gap: 12px;
@@ -992,11 +992,6 @@ body {
   cursor: pointer;
   transition: all 0.2s ease;
   border: 1px solid transparent;
-}
-
-.dm-user-card:hover {
-  background: rgba(57, 255, 20, 0.05);
-  border-color: rgba(57, 255, 20, 0.1);
 }
 
 .dm-user-info {
@@ -1522,9 +1517,10 @@ body {
 .dm-list {
   display: flex;
   flex-direction: column;
-  height: 100%;
+  height: auto;
+  min-height: 0;
+  /* Allow flex shrinking for scrolling */
   background: linear-gradient(180deg, rgba(13, 13, 13, 0.98) 0%, rgba(10, 15, 10, 0.98) 100%);
-  overflow: hidden;
 }
 
 /* Search Container */

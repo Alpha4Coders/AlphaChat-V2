@@ -66,30 +66,32 @@ const Sidebar = () => {
                     <HiChevronDown className="w-4 h-4 text-gray-500" />
                 </button>
 
-                {/* Custom Tabs */}
-                <div className="grid grid-cols-2 gap-2 mb-4 px-1">
-                    <button
-                        onClick={() => setActiveTab('chats')}
-                        className={`flex items-center justify-center gap-1.5 px-2 py-1.5 rounded-lg transition-all ${activeTab === 'chats'
-                            ? 'bg-[#39ff14] text-black font-bold shadow-[0_0_10px_rgba(57,255,20,0.3)]'
-                            : 'text-gray-400 hover:text-white bg-[#39ff14]/5 hover:bg-[#39ff14]/10'
-                            }`}
-                    >
-                        <HiChatAlt2 className="w-4 h-4 flex-shrink-0" />
-                        <span className="text-xs font-medium">Chats</span>
-                    </button>
+                {/* Custom Tabs - Hidden when in New Chat mode */}
+                {!showNewChat && (
+                    <div className="grid grid-cols-2 gap-2 mb-4 px-1">
+                        <button
+                            onClick={() => setActiveTab('chats')}
+                            className={`flex items-center justify-center gap-1.5 px-2 py-1.5 rounded-lg transition-all ${activeTab === 'chats'
+                                ? 'bg-[#39ff14] text-black font-bold shadow-[0_0_10px_rgba(57,255,20,0.3)]'
+                                : 'text-gray-400 hover:text-white bg-[#39ff14]/5 hover:bg-[#39ff14]/10'
+                                }`}
+                        >
+                            <HiChatAlt2 className="w-4 h-4 flex-shrink-0" />
+                            <span className="text-xs font-medium">Chats</span>
+                        </button>
 
-                    <button
-                        onClick={() => setActiveTab('channels')}
-                        className={`flex items-center justify-center gap-1.5 px-2 py-1.5 rounded-lg transition-all ${activeTab === 'channels'
-                            ? 'bg-[#39ff14] text-black font-bold shadow-[0_0_10px_rgba(57,255,20,0.3)]'
-                            : 'text-gray-400 hover:text-white bg-[#39ff14]/5 hover:bg-[#39ff14]/10'
-                            }`}
-                    >
-                        <HiHashtag className="w-4 h-4 flex-shrink-0" />
-                        <span className="text-xs font-medium">Channels</span>
-                    </button>
-                </div>
+                        <button
+                            onClick={() => setActiveTab('channels')}
+                            className={`flex items-center justify-center gap-1.5 px-2 py-1.5 rounded-lg transition-all ${activeTab === 'channels'
+                                ? 'bg-[#39ff14] text-black font-bold shadow-[0_0_10px_rgba(57,255,20,0.3)]'
+                                : 'text-gray-400 hover:text-white bg-[#39ff14]/5 hover:bg-[#39ff14]/10'
+                                }`}
+                        >
+                            <HiHashtag className="w-4 h-4 flex-shrink-0" />
+                            <span className="text-xs font-medium">Channels</span>
+                        </button>
+                    </div>
+                )}
 
                 {/* Search Bar Row */}
                 <div className="flex items-center gap-2 mb-2">
@@ -115,8 +117,7 @@ const Sidebar = () => {
             </div>
 
             {/* Content Area - Fixed overflow handling */}
-            <div className="flex-1 overflow-hidden px-2 pb-2 flex flex-col relative">
-
+            <div className="flex-1 px-2 pb-2 flex flex-col relative min-h-0">
                 {!showNewChat && (
                     <>
                         {/* CHANNELS VIEW - Needs its own scroll container */}
@@ -185,21 +186,23 @@ const Sidebar = () => {
 
                 {/* New Chat Overlay */}
                 {showNewChat && (
-                    <div className="absolute inset-0 bg-[#0d1117] z-30 flex flex-col animate-fadeIn">
-                        <div className="flex items-center justify-between px-3 py-3 border-b border-[#39ff14]/10 bg-[#0d1117]">
+                    <div className="flex-1 flex flex-col bg-[#0d1117] z-30 animate-fadeIn overflow-hidden">
+                        <div className="flex items-center justify-between px-3 py-3 border-b border-[#39ff14]/10 bg-[#0d1117] flex-shrink-0">
                             <span className="text-[#39ff14] font-bold text-sm uppercase tracking-wider">New Chat</span>
                             <button
                                 onClick={() => setShowNewChat(false)}
-                                className="p-1 rounded-full hover:bg-[#39ff14]/10 text-gray-400 hover:text-white transition-colors"
+                                className="p-2 rounded-lg hover:bg-[#39ff14]/10 text-[#39ff14] hover:text-white transition-colors border border-[#39ff14]/20 hover:border-[#39ff14]/40"
+                                title="Back to Chats"
                             >
                                 <HiX className="w-5 h-5" />
                             </button>
                         </div>
-                        <div className="flex-1 overflow-hidden relative">
+                        <div className="flex-1 flex flex-col overflow-hidden">
                             <DMList
                                 searchQuery={searchQuery}
                                 isNewChatMode={true}
                                 onCloseNewChat={() => setShowNewChat(false)}
+                                onSwitchToChats={() => setActiveTab('chats')}
                             />
                         </div>
                     </div>

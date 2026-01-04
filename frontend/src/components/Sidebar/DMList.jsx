@@ -89,7 +89,7 @@ const DEFAULT_USERS = [
     }
 ]
 
-const DMList = ({ searchQuery = '', isNewChatMode = false, onCloseNewChat }) => {
+const DMList = ({ searchQuery = '', isNewChatMode = false, onCloseNewChat, onSwitchToChats }) => {
     const dispatch = useDispatch()
     const { conversations, activeConversation, onlineUsers } = useSelector(state => state.chat)
     const { user: currentUser } = useSelector(state => state.user)
@@ -102,8 +102,10 @@ const DMList = ({ searchQuery = '', isNewChatMode = false, onCloseNewChat }) => 
             for (const user of DEFAULT_USERS) {
                 if (user.github) {
                     try {
-                        const response = await axios.get(`https://api.github.com/users/${user.username}`)
-                        avatars[user.id] = response.data.avatar_url
+                        // Use fetch instead of axios to avoid CORS issues with withCredentials
+                        const response = await fetch(`https://api.github.com/users/${user.username}`)
+                        const data = await response.json()
+                        avatars[user.id] = data.avatar_url
                     } catch (error) {
                         console.error(`Failed to fetch avatar for ${user.username}:`, error)
                         avatars[user.id] = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.displayName)}&background=39ff14&color=0d0d0d&size=128`
@@ -182,7 +184,10 @@ const DMList = ({ searchQuery = '', isNewChatMode = false, onCloseNewChat }) => 
                     console.error('Failed to create conversation:', error)
                 }
 
-                if (isNewChatMode && onCloseNewChat) onCloseNewChat()
+                if (isNewChatMode) {
+                    if (onSwitchToChats) onSwitchToChats()
+                    if (onCloseNewChat) onCloseNewChat()
+                }
             }
         } catch (error) {
             console.error('Handle user click error:', error)
@@ -227,7 +232,7 @@ const DMList = ({ searchQuery = '', isNewChatMode = false, onCloseNewChat }) => 
     }
 
     return (
-        <div className="dm-list">
+        <div className="dm-list flex-1 h-full">
             {/* Connection Status - Only show in main list */}
             {!isNewChatMode && (
                 <div className="dm-connection-status">
@@ -243,7 +248,7 @@ const DMList = ({ searchQuery = '', isNewChatMode = false, onCloseNewChat }) => 
             )}
 
             {/* Users List */}
-            <div className="dm-users-scroll">
+            <div className="dm-users-scroll overflow-y-auto">
                 {filteredUsers.length === 0 ? (
                     <p className="dm-no-users">
                         {isNewChatMode ? 'No developers found' : 'No active conversations'}
