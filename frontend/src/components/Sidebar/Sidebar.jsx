@@ -176,7 +176,7 @@ const Sidebar = () => {
                         {/* Floating Action Button (FAB) */}
                         <button
                             onClick={() => setShowNewChat(true)}
-                            className="absolute bottom-4 right-4 w-12 h-12 bg-[#39ff14] text-black rounded-full flex items-center justify-center shadow-[0_0_15px_rgba(57,255,20,0.4)] hover:shadow-[0_0_20px_rgba(57,255,20,0.6)] hover:scale-110 transition-all z-10 group"
+                            className="fixed bottom-6 right-6 w-12 h-12 bg-[#39ff14] text-black rounded-full flex items-center justify-center shadow-[0_0_15px_rgba(57,255,20,0.4)] hover:shadow-[0_0_20px_rgba(57,255,20,0.6)] hover:scale-110 transition-all z-50 group"
                         >
                             <HiPlus className="w-6 h-6 group-hover:rotate-90 transition-transform duration-300" />
                         </button>
@@ -207,7 +207,7 @@ const Sidebar = () => {
             </div>
 
             {/* Profile Footer */}
-            <div className="mt-auto flex-shrink-0 p-3 pb-10 mb-2 bg-[#0d1117] border-t border-[#39ff14]/10 z-30 shadow-[0_-10px_20px_rgba(13,17,23,0.8)]">
+            <div className="mt-auto flex-shrink-0 p-3 pb-3 mb-2 bg-[#0d1117] border-t border-[#39ff14]/10 z-30 shadow-[0_-10px_20px_rgba(13,17,23,0.8)]">
                 <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-[#39ff14]/5 cursor-pointer transition-colors">
                     <div className="relative">
                         <img
