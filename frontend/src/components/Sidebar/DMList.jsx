@@ -5,13 +5,15 @@ import { setActiveConversation, setConversations } from '../../redux/chatSlice'
 import axios from '../../config/axios'
 import { ENDPOINTS } from '../../config/api'
 
-// Default users - Co-founders and Core Team
+// Default users — Co-founders and Core Team
+// Avatars use GitHub's direct avatar URL (no API calls needed)
 const DEFAULT_USERS = [
     {
         id: 'default-1',
         displayName: 'Vikash Gupta',
         username: 'Vortex-16',
         github: 'https://github.com/Vortex-16',
+        avatarUrl: 'https://avatars.githubusercontent.com/Vortex-16',
         role: 'Co-founder',
         isDefault: true
     },
@@ -20,6 +22,7 @@ const DEFAULT_USERS = [
         displayName: 'Archisman',
         username: 'Dealer-09',
         github: 'https://github.com/Dealer-09',
+        avatarUrl: 'https://avatars.githubusercontent.com/Dealer-09',
         role: 'Co-founder',
         isDefault: true
     },
@@ -28,6 +31,7 @@ const DEFAULT_USERS = [
         displayName: 'Rajbeer',
         username: 'PixelPioneer404',
         github: 'https://github.com/PixelPioneer404',
+        avatarUrl: 'https://avatars.githubusercontent.com/PixelPioneer404',
         role: 'Co-founder',
         isDefault: true
     },
@@ -36,6 +40,7 @@ const DEFAULT_USERS = [
         displayName: 'Rouvik',
         username: 'Rouvik',
         github: 'https://github.com/Rouvik',
+        avatarUrl: 'https://avatars.githubusercontent.com/Rouvik',
         role: 'Co-founder',
         isDefault: true
     },
@@ -44,6 +49,7 @@ const DEFAULT_USERS = [
         displayName: 'Ayush',
         username: 'AyushChowdhuryCSE',
         github: 'https://github.com/AyushChowdhuryCSE',
+        avatarUrl: 'https://avatars.githubusercontent.com/AyushChowdhuryCSE',
         role: 'Core Team',
         isDefault: true
     },
@@ -52,6 +58,7 @@ const DEFAULT_USERS = [
         displayName: 'Ayan',
         username: 'AyanAlikhan11',
         github: 'https://github.com/AyanAlikhan11',
+        avatarUrl: 'https://avatars.githubusercontent.com/AyanAlikhan11',
         role: 'Core Team',
         isDefault: true
     },
@@ -60,6 +67,7 @@ const DEFAULT_USERS = [
         displayName: 'Rajdeep',
         username: 'yourajdeep',
         github: 'https://github.com/yourajdeep',
+        avatarUrl: 'https://avatars.githubusercontent.com/yourajdeep',
         role: 'Core Team',
         isDefault: true
     },
@@ -68,6 +76,7 @@ const DEFAULT_USERS = [
         displayName: 'Nikhil',
         username: 'nikhil-chourasia',
         github: 'https://github.com/nikhil-chourasia',
+        avatarUrl: 'https://avatars.githubusercontent.com/nikhil-chourasia',
         role: 'Core Team',
         isDefault: true
     },
@@ -76,6 +85,7 @@ const DEFAULT_USERS = [
         displayName: 'Shoaib',
         username: 'shoaib',
         github: null,
+        avatarUrl: 'https://ui-avatars.com/api/?name=Shoaib&background=39ff14&color=0d0d0d&size=128',
         role: 'Core Team',
         isDefault: true
     },
@@ -84,6 +94,7 @@ const DEFAULT_USERS = [
         displayName: 'Jeet',
         username: 'Jeet-Pathak',
         github: 'https://github.com/Jeet-Pathak',
+        avatarUrl: 'https://avatars.githubusercontent.com/Jeet-Pathak',
         role: 'Core Team',
         isDefault: true
     }
@@ -93,32 +104,6 @@ const DMList = ({ searchQuery = '', isNewChatMode = false, onCloseNewChat, onSwi
     const dispatch = useDispatch()
     const { conversations, activeConversation, onlineUsers } = useSelector(state => state.chat)
     const { user: currentUser } = useSelector(state => state.user)
-    const [userAvatars, setUserAvatars] = useState({})
-
-    // Fetch GitHub avatars for default users
-    useEffect(() => {
-        const fetchGitHubAvatars = async () => {
-            const avatars = {}
-            for (const user of DEFAULT_USERS) {
-                if (user.github) {
-                    try {
-                        // Use fetch instead of axios to avoid CORS issues with withCredentials
-                        const response = await fetch(`https://api.github.com/users/${user.username}`)
-                        const data = await response.json()
-                        avatars[user.id] = data.avatar_url
-                    } catch (error) {
-                        console.error(`Failed to fetch avatar for ${user.username}:`, error)
-                        avatars[user.id] = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.displayName)}&background=39ff14&color=0d0d0d&size=128`
-                    }
-                } else {
-                    avatars[user.id] = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.displayName)}&background=39ff14&color=0d0d0d&size=128`
-                }
-            }
-            setUserAvatars(avatars)
-        }
-
-        fetchGitHubAvatars()
-    }, [])
 
     // Filter current user out of DEFAULT_USERS
     const availableUsers = DEFAULT_USERS.filter(u =>
@@ -215,12 +200,8 @@ const DMList = ({ searchQuery = '', isNewChatMode = false, onCloseNewChat, onSwi
         const user = isNewChatMode ? item : item.otherUser;
         if (!user) return '';
 
-        if (user.avatar) {
-            return user.avatar
-        }
-        if (item.isDefault && userAvatars[item.id]) {
-            return userAvatars[item.id]
-        }
+        if (user.avatar) return user.avatar
+        if (item.avatarUrl) return item.avatarUrl
         return `https://ui-avatars.com/api/?name=${encodeURIComponent(user.displayName || 'User')}&background=39ff14&color=0d0d0d&size=128`
     }
 

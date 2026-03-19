@@ -13,8 +13,6 @@ const Chat = () => {
     const containerRef = useRef(null)
     const { activeChannel, activeConversation } = useSelector(state => state.chat)
 
-    console.log('Chat.jsx render - activeChannel:', activeChannel, 'activeConversation:', activeConversation)
-
     // GSAP entrance animation - with clearProps to prevent layout issues
     useLayoutEffect(() => {
         const ctx = gsap.context(() => {

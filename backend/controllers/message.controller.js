@@ -35,28 +35,31 @@ export const sendChannelMessage = async (req, res) => {
         }
 
         // Handle file uploads if any
-        let files = [];
-        let imageUrl = "";
+        let files = []
+        let imageUrl = ''
 
         if (req.files && req.files.length > 0) {
             for (const file of req.files) {
-                const result = await cloudinary.uploader.upload_stream({
-                    resource_type: 'auto',
-                    folder: 'alpha-chats-v2/channels'
-                }, (error, result) => {
-                    if (error) throw error;
-                    return result;
-                });
+                const result = await new Promise((resolve, reject) => {
+                    const stream = cloudinary.uploader.upload_stream(
+                        { resource_type: 'auto', folder: 'alpha-chats-v2/channels' },
+                        (error, result) => {
+                            if (error) reject(error)
+                            else resolve(result)
+                        }
+                    )
+                    stream.end(file.buffer)
+                })
 
                 files.push({
                     name: file.originalname,
                     url: result.secure_url,
                     size: file.size,
                     type: file.mimetype
-                });
+                })
 
                 if (file.mimetype.startsWith('image/')) {
-                    imageUrl = result.secure_url;
+                    imageUrl = result.secure_url
                 }
             }
         }

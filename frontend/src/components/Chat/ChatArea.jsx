@@ -1,6 +1,6 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { HiUsers, HiDotsVertical, HiStar, HiOutlineStar, HiX } from 'react-icons/hi'
+import { HiUsers, HiDotsVertical, HiOutlineStar, HiX } from 'react-icons/hi'
 import { FaPaperPlane, FaCode, FaPaperclip, FaBold, FaItalic, FaStrikethrough, FaLink, FaListUl, FaListOl } from 'react-icons/fa'
 import { HiEmojiHappy } from 'react-icons/hi'
 import axios from '../../config/axios'
@@ -9,10 +9,10 @@ import { setChannelMessages, addChannelMessage, setDMMessages, addDMMessage, set
 import { getSocket, sendTyping } from '../../hooks/useSocket'
 import MessageItem from './MessageItem'
 import LoadingSpinner from '../Common/LoadingSpinner'
+import detectLanguage from '../../utils/detectLanguage'
 
 const ChatArea = () => {
     const dispatch = useDispatch()
-    const messagesEndRef = useRef(null)
     const messagesContainerRef = useRef(null)
     const { user } = useSelector(state => state.user)
     const { activeChannel, activeConversation, channelMessages, dmMessages, typingUsers, isLoadingMessages } = useSelector(state => state.chat)
@@ -20,30 +20,16 @@ const ChatArea = () => {
     const [message, setMessage] = useState('')
     const [messageType, setMessageType] = useState('text')
     const [isSending, setIsSending] = useState(false)
-    const [isStarred, setIsStarred] = useState(false)
+    const [sendError, setSendError] = useState('')
 
     // Edit modal state
     const [editingMessage, setEditingMessage] = useState(null)
     const [editContent, setEditContent] = useState('')
     const [isEditing, setIsEditing] = useState(false)
 
-    // Auto-detect programming language from code content
-    const detectLanguage = (code) => {
-        if (/\b(def |import |from |print\(|if __name__|elif |lambda )/.test(code)) return 'python'
-        if (/\b(const |let |var |function |=>|console\.|require\(|export )/.test(code)) return 'javascript'
-        if (/\b(interface |type |: string|: number|: boolean)/.test(code)) return 'typescript'
-        if (/\b(public class|public static void|System\.out|private |protected )/.test(code)) return 'java'
-        if (/\b(#include|int main|printf\(|scanf\(|void \*)/.test(code)) return 'c'
-        if (/\b(std::|cout|cin|namespace )/.test(code)) return 'cpp'
-        if (/\b(using System|namespace |Console\.Write)/.test(code)) return 'csharp'
-        if (/\b(package main|func |fmt\.)/.test(code)) return 'go'
-        if (/\b(fn |let mut|impl |pub fn|println!)/.test(code)) return 'rust'
-        if (/\b(def |end$|puts |require ')/.test(code)) return 'ruby'
-        if (/\b(SELECT |FROM |WHERE |INSERT INTO|CREATE TABLE)/.test(code)) return 'sql'
-        if (/section \.|mov |syscall|global _start|eax|ebx|rax|rdi/.test(code)) return 'nasm'
-        if (/#!.*\b(bash|sh)\b|echo |sudo |apt |npm run/.test(code)) return 'bash'
-        return 'text'
-    }
+    // Typing debounce ref
+    const typingTimeoutRef = useRef(null)
+
 
     const isChannel = !!activeChannel
     const chatId = isChannel ? activeChannel._id : activeConversation?._id
@@ -132,10 +118,14 @@ const ChatArea = () => {
         }
     }, [activeChannel, activeConversation, dispatch])
 
-    // Scroll to bottom on new messages - using direct scrollTop to avoid scrolling parent containers
+    // Scroll to bottom only when user is already near the bottom
     useEffect(() => {
-        if (messagesContainerRef.current) {
-            messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight
+        const container = messagesContainerRef.current
+        if (!container) return
+        const distanceFromBottom = container.scrollHeight - container.scrollTop - container.clientHeight
+        // Auto-scroll if within 120px of bottom (user hasn't scrolled up)
+        if (distanceFromBottom < 120) {
+            container.scrollTop = container.scrollHeight
         }
     }, [messages])
 
@@ -144,12 +134,16 @@ const ChatArea = () => {
         if (!message.trim() || isSending) return
 
         setIsSending(true)
+        setSendError('')
+
+        const codeLanguage = messageType === 'code' ? detectLanguage(message.trim()) : ''
 
         try {
             if (isChannel) {
                 const res = await axios.post(ENDPOINTS.MESSAGES.CHANNEL(activeChannel._id), {
                     content: message.trim(),
-                    messageType
+                    messageType,
+                    codeLanguage
                 })
 
                 if (res.data.success) {
@@ -160,7 +154,8 @@ const ChatArea = () => {
                 const recipientId = activeConversation.otherUser._id
                 const res = await axios.post(ENDPOINTS.MESSAGES.DM(recipientId), {
                     content: message.trim(),
-                    messageType
+                    messageType,
+                    codeLanguage
                 })
 
                 if (res.data.success) {
@@ -169,22 +164,38 @@ const ChatArea = () => {
                 }
             }
         } catch (error) {
-            console.error('Failed to send message:', error)
-            alert('Failed to send message. You may need to join this channel first.')
+            setSendError('Failed to send message. Make sure you have joined this channel.')
+            setTimeout(() => setSendError(''), 4000)
         } finally {
             setIsSending(false)
         }
     }
 
-    const handleTyping = (isTyping) => {
-        sendTyping({
-            channelId: isChannel ? activeChannel._id : null,
-            recipientId: !isChannel ? activeConversation.otherUser._id : null,
-            senderId: user.id,
-            senderName: user.displayName,
-            isTyping
-        })
-    }
+    const handleTyping = useCallback((isTyping) => {
+        if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current)
+
+        if (isTyping) {
+            // Debounce: only emit 'typing: true' after 300ms of no new input
+            typingTimeoutRef.current = setTimeout(() => {
+                sendTyping({
+                    channelId: isChannel ? activeChannel._id : null,
+                    recipientId: !isChannel ? activeConversation?.otherUser?._id : null,
+                    senderId: user.id,
+                    senderName: user.displayName,
+                    isTyping: true
+                })
+            }, 300)
+        } else {
+            // Stop typing immediately when blur or message sent
+            sendTyping({
+                channelId: isChannel ? activeChannel._id : null,
+                recipientId: !isChannel ? activeConversation?.otherUser?._id : null,
+                senderId: user.id,
+                senderName: user.displayName,
+                isTyping: false
+            })
+        }
+    }, [isChannel, activeChannel, activeConversation, user])
 
     // Edit message handlers
     const handleEditStart = (msg) => {
@@ -215,11 +226,20 @@ const ChatArea = () => {
                 handleEditCancel()
             }
         } catch (error) {
-            console.error('Failed to edit message:', error)
-            alert('Failed to edit message')
+            setSendError('Failed to edit message. Please try again.')
+            setTimeout(() => setSendError(''), 3000)
         } finally {
             setIsEditing(false)
         }
+    }
+
+    // Typing indicator text with correct grammar
+    const typingText = () => {
+        const names = Object.values(typingInChat)
+        if (names.length === 0) return ''
+        if (names.length === 1) return `${names[0]} is typing...`
+        if (names.length === 2) return `${names[0]} and ${names[1]} are typing...`
+        return `${names.slice(0, -1).join(', ')} and ${names[names.length - 1]} are typing...`
     }
 
     // Header info
@@ -244,12 +264,8 @@ const ChatArea = () => {
                         </h2>
                         <p className="slack-chat-meta">{headerSubtitle}</p>
                     </div>
-                    <button
-                        className={`slack-chat-star ml-2 ${isStarred ? 'active' : ''}`}
-                        onClick={() => setIsStarred(!isStarred)}
-                    >
-                        {isStarred ? <HiStar className="w-5 h-5" /> : <HiOutlineStar className="w-5 h-5" />}
-                    </button>
+                    {/* Star feature placeholder — not yet persisted */}
+                    <HiOutlineStar className="w-5 h-5 text-gray-600" title="Bookmark (coming soon)" />
                 </div>
                 <div className="slack-chat-actions">
                     {isChannel && (
@@ -281,6 +297,7 @@ const ChatArea = () => {
                                     (messages[index - 1]?.sender._id || messages[index - 1]?.sender) !== (msg.sender._id || msg.sender)
                                 }
                                 channelId={isChannel ? activeChannel._id : null}
+                                messageType={isChannel ? 'channel' : 'dm'}
                                 onEdit={handleEditStart}
                             />
                         ))}
@@ -308,7 +325,7 @@ const ChatArea = () => {
                             <div className="w-2 h-2 rounded-full bg-[#39ff14] typing-dot" />
                             <div className="w-2 h-2 rounded-full bg-[#39ff14] typing-dot" />
                         </div>
-                        <span className="text-xs">{Object.values(typingInChat).join(', ')} is typing...</span>
+                        <span className="text-xs">{typingText()}</span>
                     </div>
                 )}
             </div>
@@ -320,23 +337,23 @@ const ChatArea = () => {
                         <div className="slack-input-wrapper">
                             {/* Toolbar */}
                             <div className="slack-input-toolbar">
-                                <button type="button" className="slack-toolbar-btn" title="Bold">
+                                <button type="button" className="slack-toolbar-btn opacity-40 cursor-not-allowed" title="Bold (coming soon)" disabled>
                                     <FaBold />
                                 </button>
-                                <button type="button" className="slack-toolbar-btn" title="Italic">
+                                <button type="button" className="slack-toolbar-btn opacity-40 cursor-not-allowed" title="Italic (coming soon)" disabled>
                                     <FaItalic />
                                 </button>
-                                <button type="button" className="slack-toolbar-btn" title="Strikethrough">
+                                <button type="button" className="slack-toolbar-btn opacity-40 cursor-not-allowed" title="Strikethrough (coming soon)" disabled>
                                     <FaStrikethrough />
                                 </button>
                                 <div className="slack-toolbar-divider" />
-                                <button type="button" className="slack-toolbar-btn" title="Link">
+                                <button type="button" className="slack-toolbar-btn opacity-40 cursor-not-allowed" title="Link (coming soon)" disabled>
                                     <FaLink />
                                 </button>
-                                <button type="button" className="slack-toolbar-btn" title="Bulleted list">
+                                <button type="button" className="slack-toolbar-btn opacity-40 cursor-not-allowed" title="Bulleted list (coming soon)" disabled>
                                     <FaListUl />
                                 </button>
-                                <button type="button" className="slack-toolbar-btn" title="Numbered list">
+                                <button type="button" className="slack-toolbar-btn opacity-40 cursor-not-allowed" title="Numbered list (coming soon)" disabled>
                                     <FaListOl />
                                 </button>
                                 <div className="slack-toolbar-divider" />
@@ -352,7 +369,7 @@ const ChatArea = () => {
 
                             {/* Input Area */}
                             <div className="slack-input-area">
-                                <button type="button" className="slack-toolbar-btn" title="Attach file">
+                                <button type="button" className="slack-toolbar-btn opacity-40 cursor-not-allowed" title="Attach file (coming soon)" disabled>
                                     <FaPaperclip />
                                 </button>
                                 <textarea
@@ -371,7 +388,7 @@ const ChatArea = () => {
                                         }
                                     }}
                                 />
-                                <button type="button" className="slack-toolbar-btn" title="Add emoji">
+                                <button type="button" className="slack-toolbar-btn opacity-40 cursor-not-allowed" title="Emoji picker (coming soon)" disabled>
                                     <HiEmojiHappy className="w-5 h-5" />
                                 </button>
                                 <button
@@ -387,7 +404,12 @@ const ChatArea = () => {
 
                         {messageType === 'code' && (
                             <p className="text-xs text-[#39ff14]/70 mt-2 ml-2">
-                                Code mode enabled - your message will be formatted as code
+                                Code mode enabled — language will be auto-detected
+                            </p>
+                        )}
+                        {sendError && (
+                            <p className="text-xs text-red-400 mt-2 ml-2 animate-pulse">
+                                ⚠️ {sendError}
                             </p>
                         )}
                     </form>

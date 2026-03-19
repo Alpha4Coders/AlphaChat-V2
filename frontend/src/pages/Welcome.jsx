@@ -4,6 +4,18 @@ import { HiChat } from 'react-icons/hi'
 import { gsap } from 'gsap'
 import { ENDPOINTS } from '../config/api'
 
+// Pre-computed random values — avoids Math.random() inside JSX (which reruns on every render)
+const MATRIX_CELLS = Array.from({ length: 50 }, (_, i) => ({
+    delay: `${i * 0.05}s`,
+    duration: `${2 + (((i * 17) % 30) / 10)}s` // deterministic pseudo-random
+}))
+
+const PARTICLES = Array.from({ length: 20 }, (_, i) => ({
+    left: `${(i * 37 + 13) % 100}%`,
+    delay: `${((i * 73) % 50) / 10}s`,
+    duration: `${5 + ((i * 11) % 100) / 10}s`
+}))
+
 const Welcome = () => {
     const containerRef = useRef(null)
     const terminalRef = useRef(null)
@@ -170,13 +182,13 @@ const Welcome = () => {
         <div ref={containerRef} className="min-h-screen w-full flex items-center justify-center relative overflow-hidden">
             {/* Optimized Matrix Grid Background - Reduced to 50 cells */}
             <div className="matrix-grid-optimized">
-                {Array.from({ length: 50 }, (_, i) => (
+                {MATRIX_CELLS.map((cell, i) => (
                     <div
                         key={i}
                         className="matrix-cell"
                         style={{
-                            animationDelay: `${i * 0.05}s`,
-                            animationDuration: `${2 + Math.random() * 3}s`
+                            animationDelay: cell.delay,
+                            animationDuration: cell.duration
                         }}
                     />
                 ))}
@@ -191,14 +203,14 @@ const Welcome = () => {
 
             {/* Floating Particles */}
             <div className="particles">
-                {Array.from({ length: 20 }, (_, i) => (
+                {PARTICLES.map((p, i) => (
                     <div
                         key={i}
                         className="particle"
                         style={{
-                            left: `${Math.random() * 100}%`,
-                            animationDelay: `${Math.random() * 5}s`,
-                            animationDuration: `${5 + Math.random() * 10}s`
+                            left: p.left,
+                            animationDelay: p.delay,
+                            animationDuration: p.duration
                         }}
                     />
                 ))}

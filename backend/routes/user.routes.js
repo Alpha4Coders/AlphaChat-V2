@@ -23,10 +23,10 @@ router.get("/search", isAuthenticated, searchUsers);
 // Get team members (co-founders and core team)
 router.get("/team", isAuthenticated, getTeamMembers);
 
+// Update current user's status (must be before /:username to avoid route collision)
+router.patch("/status", isAuthenticated, updateStatus);
+
 // Get user profile by username
 router.get("/:username", isAuthenticated, getUserProfile);
-
-// Update current user's status
-router.patch("/status", isAuthenticated, updateStatus);
 
 export default router;

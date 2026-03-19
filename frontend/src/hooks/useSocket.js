@@ -17,14 +17,13 @@ export const initSocket = (userId) => {
     });
 
     socket.on('connect', () => {
-        console.log('🔌 Socket connected:', socket.id);
         if (userId) {
             socket.emit('join', userId);
         }
     });
 
-    socket.on('disconnect', (reason) => {
-        console.log('❌ Socket disconnected:', reason);
+    socket.on('disconnect', () => {
+        // Socket disconnected
     });
 
     socket.on('connect_error', (error) => {

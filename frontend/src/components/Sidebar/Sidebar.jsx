@@ -4,9 +4,9 @@ import { useNavigate } from 'react-router-dom'
 import { HiChevronDown, HiRefresh, HiSearch } from 'react-icons/hi'
 import { HiChatAlt2, HiHashtag, HiPlus, HiX } from 'react-icons/hi'
 import { FaTerminal } from 'react-icons/fa'
-import { setActiveChannel, updateChannelMembership } from '../../redux/chatSlice'
+import { setActiveChannel, updateChannelMembership, setChannels } from '../../redux/chatSlice'
 import { addJoinedChannel } from '../../redux/userSlice'
-import { joinChannel as socketJoinChannel } from '../../hooks/useSocket'
+import { joinChannel as socketJoinChannel, leaveChannel as socketLeaveChannel } from '../../hooks/useSocket'
 import axios from '../../config/axios'
 import { ENDPOINTS } from '../../config/api'
 import DMList from './DMList'
@@ -17,13 +17,33 @@ const Sidebar = () => {
     const { user } = useSelector(state => state.user)
     const { channels, activeChannel } = useSelector(state => state.chat)
 
-    const [activeTab, setActiveTab] = useState('channels') // 'chats' | 'channels'
+    const [activeTab, setActiveTab] = useState('channels')
     const [searchQuery, setSearchQuery] = useState('')
     const [showNewChat, setShowNewChat] = useState(false)
+    const [isRefreshing, setIsRefreshing] = useState(false)
 
     const handleChannelClick = async (channel) => {
+        // Leave current channel socket room before switching
+        if (activeChannel?._id && activeChannel._id !== channel._id) {
+            socketLeaveChannel(activeChannel._id)
+        }
         dispatch(setActiveChannel(channel))
         socketJoinChannel(channel._id)
+    }
+
+    const handleRefresh = async () => {
+        if (isRefreshing) return
+        setIsRefreshing(true)
+        try {
+            const res = await axios.get(ENDPOINTS.CHANNELS.LIST)
+            if (res.data.success) {
+                dispatch(setChannels(res.data.channels))
+            }
+        } catch (error) {
+            // silently fail on refresh
+        } finally {
+            setIsRefreshing(false)
+        }
     }
 
     const handleJoinChannel = async (channel, e) => {
@@ -109,9 +129,10 @@ const Sidebar = () => {
                     </div>
                     <button
                         className="p-2 text-[#39ff14] border border-[#39ff14]/20 rounded-lg hover:bg-[#39ff14]/10 transition-colors flex-shrink-0"
-                        onClick={() => {/* Refresh logic if needed */ }}
+                        onClick={handleRefresh}
+                        title="Refresh channels"
                     >
-                        <HiRefresh className="w-4 h-4" />
+                        <HiRefresh className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
                     </button>
                 </div>
             </div>
