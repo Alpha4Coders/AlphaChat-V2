@@ -37,14 +37,14 @@ const allowedOrigins = [
     "http://localhost:5174",
     "http://localhost:5175",
     "http://localhost:5000",
+    "https://alphachat-v2.vercel.app",
+    "https://alphachat-v2-backend.onrender.com",
     process.env.CLIENT_URL
 ].filter(Boolean);
 
 const io = new Server(server, {
     cors: {
-        origin: process.env.NODE_ENV === 'production'
-            ? [process.env.CLIENT_URL, "http://localhost:5173", "http://localhost:5174", "http://localhost:5175"]
-            : ["http://localhost:5173", "http://localhost:5174", "http://localhost:5175"],
+        origin: allowedOrigins,
         methods: ["GET", "POST"],
         credentials: true
     }
@@ -54,26 +54,18 @@ const io = new Server(server, {
 const onlineUsers = new Map();
 const typingUsers = new Map();
 
-// Add explicit production URLs to ensure they're always allowed
-const productionOrigins = [
-    "https://alphachat-v2.vercel.app",
-    "https://alphachat-v2-backend.onrender.com"
-];
-
-const finalAllowedOrigins = [...new Set([...allowedOrigins, ...productionOrigins])];
-console.log("CORS allowed origins:", finalAllowedOrigins);
+console.log("CORS allowed origins:", allowedOrigins);
 
 app.use(cors({
     origin: function (origin, callback) {
         // Allow requests with no origin (mobile apps, Postman, etc.)
         if (!origin) return callback(null, true);
 
-        if (finalAllowedOrigins.includes(origin)) {
+        if (allowedOrigins.includes(origin)) {
             callback(null, true);
         } else {
-            // Allow but log for debugging (shouldn't happen in production)
-            console.log("CORS: Allowing unlisted origin:", origin);
-            callback(null, true);
+            console.log("CORS: Blocking unlisted origin:", origin);
+            callback(new Error("Not allowed by CORS"));
         }
     },
     credentials: true
