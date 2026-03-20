@@ -17,7 +17,7 @@ const MessageItem = ({ message, isOwn, showAvatar, channelId, messageType = 'cha
     const { user } = useSelector(state => state.user)
     const { savedMessageIds } = useSelector(state => state.chat)
 
-    const { sender, content, messageType, codeLanguage, createdAt, imageUrl, files, reactions, isPinned, isEdited, _id } = message
+    const { sender, content, messageType: msgType, codeLanguage, createdAt, imageUrl, files, reactions, isPinned, isEdited, _id } = message
     const [copied, setCopied] = useState(false)
     const [showEmojiPicker, setShowEmojiPicker] = useState(false)
     const [showMoreMenu, setShowMoreMenu] = useState(false)
@@ -60,7 +60,7 @@ const MessageItem = ({ message, isOwn, showAvatar, channelId, messageType = 'cha
         }
     }
 
-    const detectedLang = messageType === 'code' ? detectLanguage(safeContent, codeLanguage) : null
+    const detectedLang = msgType === 'code' ? detectLanguage(safeContent, codeLanguage) : null
 
     // Copy to clipboard
     const handleCopy = async () => {
@@ -271,7 +271,7 @@ const MessageItem = ({ message, isOwn, showAvatar, channelId, messageType = 'cha
                     {showMoreMenu && (
                         <div className="absolute bottom-full right-0 mb-1 bg-[#1a1a1a] border border-[#39ff14]/20 rounded-lg overflow-hidden shadow-xl z-50 min-w-[160px]">
                             {/* Edit - only for own messages */}
-                            {isOwn && messageType !== 'code' && (
+                            {isOwn && msgType !== 'code' && (
                                 <button
                                     onClick={handleEdit}
                                     className="w-full flex items-center gap-2 px-3 py-2 text-sm text-gray-300 hover:bg-[#39ff14]/10 transition-colors"
@@ -357,7 +357,7 @@ const MessageItem = ({ message, isOwn, showAvatar, channelId, messageType = 'cha
                 )}
 
                 {/* Content */}
-                {messageType === 'code' ? (
+                {msgType === 'code' ? (
                     <div className="mt-1 overflow-hidden rounded-lg border border-[#39ff14]/15 max-w-full">
                         <div className="flex items-center justify-between px-3 py-1.5 bg-black/40 text-xs font-mono text-gray-400">
                             <div className="flex items-center gap-2">
@@ -403,7 +403,7 @@ const MessageItem = ({ message, isOwn, showAvatar, channelId, messageType = 'cha
                             </SyntaxHighlighter>
                         </div>
                     </div>
-                ) : messageType === 'image' && imageUrl ? (
+                ) : msgType === 'image' && imageUrl ? (
                     <div className="mt-1">
                         <img
                             src={imageUrl}
