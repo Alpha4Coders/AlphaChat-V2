@@ -4,6 +4,7 @@ import Conversation from "../models/conversation.model.js";
 import Channel from "../models/channel.model.js";
 import User from "../models/user.model.js";
 import cloudinary from "../config/cloudinary.js";
+import fcmService from "../services/fcm.service.js";
 
 // ═══════════════════════════════════════════════════════════════════════════
 // CHANNEL MESSAGES
@@ -97,6 +98,30 @@ export const sendChannelMessage = async (req, res) => {
                 channelId,
                 message
             });
+        }
+
+        // Send FCM Push notification to offline channel members
+        try {
+            // Find all users in the channel who are NOT online and have fcmTokens
+            const offlineMembers = await User.find({
+                _id: { $in: channel.members, $ne: req.user._id },
+                isOnline: false,
+                fcmTokens: { $exists: true, $not: { $size: 0 } }
+            });
+
+            if (offlineMembers.length > 0) {
+                // Collect all valid tokens
+                const tokens = offlineMembers.flatMap(u => u.fcmTokens);
+                
+                if (tokens.length > 0) {
+                    fcmService.sendPushNotification(tokens, {
+                        title: `New message in #${channel.name}`,
+                        body: `${req.user.displayName || req.user.username}: ${messageType === 'text' ? content : 'Sent an attachment'}`
+                    });
+                }
+            }
+        } catch (fcmError) {
+            console.error("FCM Channel Error:", fcmError);
         }
 
         res.status(201).json({
@@ -554,6 +579,19 @@ export const sendDirectMessage = async (req, res) => {
                     conversationId: conversation._id,
                     message
                 });
+            } else {
+                // Recipient is offline, send push notification
+                try {
+                    const recipientUser = await User.findById(recipientId);
+                    if (recipientUser && recipientUser.fcmTokens && recipientUser.fcmTokens.length > 0) {
+                        fcmService.sendPushNotification(recipientUser.fcmTokens, {
+                            title: `New message from ${req.user.displayName || req.user.username}`,
+                            body: messageType === 'text' ? content : 'Sent an attachment'
+                        });
+                    }
+                } catch (fcmError) {
+                    console.error("FCM DM Error:", fcmError);
+                }
             }
         }
 

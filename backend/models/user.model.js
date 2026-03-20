@@ -86,6 +86,12 @@ const userSchema = new mongoose.Schema({
     default: Date.now
   },
 
+  // FCM Device Tokens for Push Notifications
+  fcmTokens: {
+    type: [String],
+    default: []
+  },
+
   // Access Token (for API calls to GitHub if needed)
   accessToken: {
     type: String,

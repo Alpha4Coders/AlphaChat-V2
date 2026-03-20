@@ -133,11 +133,36 @@ export const getTeamMembers = async (req, res) => {
     }
 };
 
+// Register FCM Token for push notifications
+export const registerFcmToken = async (req, res) => {
+    try {
+        const { token } = req.body;
+        
+        if (!token) {
+            return res.status(400).json({ success: false, message: "FCM token is required" });
+        }
+
+        // Add token to user's fcmTokens array if it doesn't exist
+        await User.findByIdAndUpdate(req.user._id, {
+            $addToSet: { fcmTokens: token }
+        });
+
+        res.json({
+            success: true,
+            message: "FCM token registered successfully"
+        });
+    } catch (error) {
+        console.error("Register FCM token error:", error);
+        res.status(500).json({ success: false, message: "Failed to register FCM token" });
+    }
+};
+
 export default {
     getAllUsers,
     getUserProfile,
     updateStatus,
     getOnlineUsers,
     searchUsers,
-    getTeamMembers
+    getTeamMembers,
+    registerFcmToken
 };

@@ -5,7 +5,8 @@ import {
     updateStatus,
     getOnlineUsers,
     searchUsers,
-    getTeamMembers
+    getTeamMembers,
+    registerFcmToken
 } from "../controllers/user.controller.js";
 import { isAuthenticated } from "../middlewares/auth.middleware.js";
 
@@ -25,6 +26,9 @@ router.get("/team", isAuthenticated, getTeamMembers);
 
 // Update current user's status (must be before /:username to avoid route collision)
 router.patch("/status", isAuthenticated, updateStatus);
+
+// Register FCM device token
+router.post("/fcm-token", isAuthenticated, registerFcmToken);
 
 // Get user profile by username
 router.get("/:username", isAuthenticated, getUserProfile);
