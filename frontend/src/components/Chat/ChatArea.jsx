@@ -14,6 +14,7 @@ import detectLanguage from '../../utils/detectLanguage'
 const ChatArea = () => {
     const dispatch = useDispatch()
     const messagesContainerRef = useRef(null)
+    const messagesEndRef = useRef(null)
     const { user } = useSelector(state => state.user)
     const { activeChannel, activeConversation, channelMessages, dmMessages, typingUsers, isLoadingMessages } = useSelector(state => state.chat)
 

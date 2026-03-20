@@ -113,9 +113,9 @@ npm run dev
 
 ### 5. Access the App
 
-- **Frontend**: http://localhost:5173
-- **Backend API**: http://localhost:4000
-- **Health Check**: http://localhost:4000/api/health
+- **Frontend**: https://alphachat-v2.vercel.app (or http://localhost:5173 locally)
+- **Backend API**: https://alphachat-v2.onrender.com (or http://localhost:4000 locally)
+- **Health Check**: https://alphachat-v2.onrender.com/api/health
 
 ## 📁 Project Structure
 
